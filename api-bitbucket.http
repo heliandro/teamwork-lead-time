@@ -1,0 +1,119 @@
+### LISTAR REPOSITORIOS
+# @name reqListarRepositorios
+@limiteDeRepositorios = 200
+GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos?start=0&limit={{limiteDeRepositorios}}
+Authorization: Bearer {{AccessTokenBitbucket}}
+### RESPONSE
+@repositorios = {{reqListarRepositorios.response.body.$.}}
+@repositorioSelecionado = {{reqListarRepositorios.response.body.$.values[0].slug}}
+### MODEL
+{
+    "size": 200,
+    "limit": 200,
+    "isLastPage": false,
+    "values": [
+        {
+            "slug": "projectslug-bff-transferencia",
+            "id": 12534,
+            "name": "projectslug-bff-transferencia",
+            "hierarchyId": "57dc7fc46467ff7dea69",
+            "scmId": "git",
+            "state": "AVAILABLE",
+            "statusMessage": "Available",
+            "forkable": true,
+            "project": {
+                "key": "PROJECTSLUG",
+                "id": 330,
+                "name": "SUAEMPRESA Global Solutions",
+                "public": false,
+                "type": "NORMAL",
+                "links": {
+                    "self": [
+                        {
+                            "href": "https://bitbucket.SUAEMPRESA.com.br:8443/projects/PROJECTSLUG"
+                        }
+                    ]
+                }
+            },
+            "public": false,
+            "links": {
+                "clone": [
+                    {
+                        "href": "https://bitbucket.SUAEMPRESA.com.br:8443/scm/PROJECTSLUG/projectslug-bff-transferencia.git",
+                        "name": "http"
+                    },
+                    {
+                        "href": "ssh://git@bitbucket.SUAEMPRESA.com.br:7999/PROJECTSLUG/projectslug-bff-transferencia.git",
+                        "name": "ssh"
+                    }
+                ],
+                "self": [
+                    {
+                        "href": "https://bitbucket.SUAEMPRESA.com.br:8443/projects/PROJECTSLUG/repos/projectslug-bff-transferencia/browse"
+                    }
+                ]
+            }
+        }
+    ]
+}
+
+
+
+### LISTAR COMMITS DO REPOSITORIO
+# @name reqListarCommitsRepositorio
+@limiteDeCommits = 300
+GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}/commits?start=0&limit={{limiteDeCommits}}
+Authorization: Bearer {{AccessTokenBitbucket}}
+### RESPONSE
+@commitsDoRepositorio = {{reqListarCommitsRepositorio.response.body.$.}}
+### MODEL
+{
+    "id": "e820ce315934e213c37691241f4300443b9d7eb1",
+    "displayId": "e820ce31593",
+    "author": {
+        "name": "I361240",
+        "emailAddress": "JOAO.SILVA@SUAEMPRESA.COM.BR",
+        "id": 3618,
+        "displayName": "JOAO SILVA",
+        "active": true,
+        "slug": "i361240",
+        "type": "NORMAL",
+        "links": {
+            "self": [
+                {
+                    "href": "https://bitbucket.SUAEMPRESA.com.br:8443/users/i361240"
+                }
+            ]
+        }
+    },
+    "authorTimestamp": 1687543238000,
+    "committer": {
+        "name": "I361240",
+        "emailAddress": "JOAO.SILVA@SUAEMPRESA.COM.BR",
+        "id": 3618,
+        "displayName": "JOAO SILVA",
+        "active": true,
+        "slug": "i361240",
+        "type": "NORMAL",
+        "links": {
+            "self": [
+                {
+                    "href": "https://bitbucket.SUAEMPRESA.com.br:8443/users/i361240"
+                }
+            ]
+        }
+    },
+    "committerTimestamp": 1687543238000,
+    "message": "[CODE-17005] - Subindo versão",
+    "parents": [
+        {
+            "id": "a9ccd2a5a3d8e4381c1e229ca0ddd4f8b7fdfcad",
+            "displayId": "a9ccd2a5a3d"
+        }
+    ],
+    "properties": {
+        "jira-key": [
+            "CODE-17005"
+        ]
+    }
+}
