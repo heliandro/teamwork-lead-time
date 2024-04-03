@@ -4,6 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { applicationConfig } from './config/configuration';
 import HealthImplUseCase from './application/usecases/health-impl.usecase';
 import { UtilsModule } from './utils/utils.module';
+import { BitbucketDataLoaderScheduler } from './infrastructure/schedullers/bitbucket-data-loader.scheduler';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ProjectSchema } from './domain/schemas/project.schema';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -29,9 +33,17 @@ export function loadConfig(): any {
 @Module({
     imports: [
         ConfigModule.forRoot(loadConfig()),
+        ScheduleModule.forRoot(),
+        MongooseModule.forRoot('mongodb://localhost:27017/leadtime'),
+        MongooseModule.forFeature([
+            { name: 'projects', schema: ProjectSchema },
+        ]),
         UtilsModule,
     ],
     controllers: [AppController],
-    providers: [{ provide: 'HealthUseCase', useClass: HealthImplUseCase }],
+    providers: [
+        { provide: 'HealthUseCase', useClass: HealthImplUseCase },
+        BitbucketDataLoaderScheduler,
+    ],
 })
 export class AppModule {}
