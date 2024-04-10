@@ -4,10 +4,14 @@ import { ConfigModule } from '@nestjs/config';
 import { applicationConfig } from './config/configuration';
 import HealthImplUseCase from './application/usecases/health-impl.usecase';
 import { UtilsModule } from './utils/utils.module';
-import { BitbucketDataLoaderScheduler } from './infrastructure/schedullers/bitbucket-data-loader.scheduler';
+import { MetricsDataLoaderScheduler } from './infrastructure/schedullers/metrics-data-loader.scheduler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProjectSchema } from './domain/schemas/project.schema';
+import { AppLastUpdateSchema } from './domain/schemas/app-lastupdate.schema';
+import { AppConfigurationRepository } from './infrastructure/repositories/app-configuration.repository';
+import { HttpModule } from '@nestjs/axios';
+import { BitbucketImplGateway } from './infrastructure/gateways/bitbucket-impl.gateway';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -37,13 +41,23 @@ export function loadConfig(): any {
         MongooseModule.forRoot('mongodb://localhost:27017/leadtime'),
         MongooseModule.forFeature([
             { name: 'projects', schema: ProjectSchema },
+            { name: 'app-configurations', schema: AppLastUpdateSchema },
         ]),
         UtilsModule,
+        HttpModule
     ],
     controllers: [AppController],
     providers: [
         { provide: 'HealthUseCase', useClass: HealthImplUseCase },
-        BitbucketDataLoaderScheduler,
+        MetricsDataLoaderScheduler,
+        {
+            provide: 'AppConfigurationRepository',
+            useClass: AppConfigurationRepository,
+        },
+        {
+            provide: 'BitbucketGateway',
+            useClass: BitbucketImplGateway,
+        }
     ],
 })
 export class AppModule {}
