@@ -5,4 +5,14 @@ services:
     image: mongo
     container_name: mongodb-leadtime
     ports:
-      - "27017:27017"
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "admin"
+      MONGO_INITDB_ROOT_PASSWORD: "admin123"
+      MONGO_INITDB_DATABASE: "teamwork_leadtime"
+    volumes:
+      - mongodb_leadtime:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    
+volumes:
+  mongodb_leadtime:
