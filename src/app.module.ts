@@ -38,13 +38,13 @@ export function loadConfig(): any {
     imports: [
         ConfigModule.forRoot(loadConfig()),
         ScheduleModule.forRoot(),
-        MongooseModule.forRoot('mongodb://localhost:27017/leadtime'),
+        MongooseModule.forRoot('mongodb://heliandro:pass123@localhost:27018/teamwork_leadtime'),
         MongooseModule.forFeature([
             { name: 'projects', schema: ProjectSchema },
             { name: 'app-configurations', schema: AppLastUpdateSchema },
         ]),
         UtilsModule,
-        HttpModule
+        HttpModule,
     ],
     controllers: [AppController],
     providers: [
@@ -57,7 +57,7 @@ export function loadConfig(): any {
         {
             provide: 'BitbucketGateway',
             useClass: BitbucketImplGateway,
-        }
+        },
     ],
 })
 export class AppModule {}
