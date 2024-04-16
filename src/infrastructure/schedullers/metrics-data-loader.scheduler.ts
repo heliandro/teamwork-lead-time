@@ -9,6 +9,10 @@ import { GetSquadsResponseSuccessDTO } from 'src/application/dtos/get-squads-res
 
 @Injectable()
 export class MetricsDataLoaderScheduler {
+
+    private bitbucketTimeToCheckInMinutes = 5;
+    private bambooTimeToCheckInMinutes = 5;
+
     constructor(
         @Inject('ConsoleLogger')
         private readonly logger: ConsoleLoggerService,
@@ -30,8 +34,9 @@ export class MetricsDataLoaderScheduler {
 
     private async dataLoader() {
         try {
-            const appConfiguration = await this.appConfigurationRepository.getDocument();
+            const appConfiguration = await this.appConfigurationRepository.getLastUpdate();
             this._validateBitbucketIsUpdated(appConfiguration);
+            // TODO - this._validateBambooIsUpdated(appConfiguration);
             this.runBitbucketDataLoader();
         } catch (error) {
             this.logger.error(`${error.message} - carga de dados cancelada!`);
@@ -75,9 +80,28 @@ export class MetricsDataLoaderScheduler {
         const squads = await this.getSquadsUseCase.execute();
         this._validateSquadsData(squads);
 
+        // TODO - implementar usecase para recuperar os projetos do bitcket e salvar no mongo
+        // await new DataLoaderBitbucketProjectsUseCase.execute()
+        // TODO - chamar internamente - implementar usecase para buscar os projetos do bitbucket no mongo
+        // const projects = await new GetBitbucketProjectsUseCase.execute()
 
-        // const projects = await this.bitbucketGateway.getProjects();
-        // console.log(projects);
+        // TODO - implementar usecase para recuperar os commits do bitcket e salvar no mongo
+        // await new DataLoaderBitbucketCommitsForProjectsUseCase.execute()
+            // TODO - chamar internamente - composicao - projects + data commits
+            // const projects = await new GetBitbucketProjectsUseCase.execute()
+            // schema - projectId + os demais campos do commit a serem mapeados
+            // await bitbucketCommitsRepository.save()
+            
+        // TODO - implementar usecase para buscar todos os projetos relacionados aos seus commits do bitbucket no mongo
+        // const commits = await new GetBitbucketProjectsWithCommitsUseCase.execute()
+            // TODO - chamar internamente - composicao de usecases - commits + projects
+            // const projects = await new GetBitbucketProjectsUseCase.execute()
+            // const commits = await new GetBitbucketCommitsUseCase.execute()
+        
+        // TODO - validar se os projetos foram retornados
+        // this._validateBitbucketProjects();
+
+        // TODO - atualizar data de última atualização do bitbucket e bamboo
         // this.appConfigurationRepository.saveLastUpdate(new Date(), null);
     }
 
@@ -88,8 +112,7 @@ export class MetricsDataLoaderScheduler {
             throw new Error('não há data de última atualização do bitbucket no documento de app-configuration');
         }
 
-        const timeToCheckInMinutes = 5;
-        let isValid = this._isLastUpdateValid(appLastUpdateDocument.bitbucketLastUpdate, timeToCheckInMinutes);
+        let isValid = this._isLastUpdateValid(appLastUpdateDocument.bitbucketLastUpdate, this.bitbucketTimeToCheckInMinutes);
 
         if (!isValid) {
             this.logger.log('Os dados do bitbucket estão desatualizados - continuando carga de dados...');

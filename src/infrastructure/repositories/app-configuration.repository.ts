@@ -10,11 +10,11 @@ export class AppConfigurationRepository {
         private readonly appLastUpdateModel: Model<AppLastUpdateDocument>,
     ) {}
 
-    async save(
+    async saveLastUpdate(
         bitbucketLastUpdate: Date,
         bambooLastUpdate: Date,
     ): Promise<AppLastUpdateDocument> {
-        const existingConfiguration = await this.getDocument();
+        const existingConfiguration = await this.getLastUpdate();
 
         if (existingConfiguration) {
             existingConfiguration.bitbucketLastUpdate = bitbucketLastUpdate;
@@ -29,7 +29,7 @@ export class AppConfigurationRepository {
         return newConfiguration.save();
     }
 
-    async getDocument(): Promise<AppLastUpdateDocument> {
+    async getLastUpdate(): Promise<AppLastUpdateDocument> {
         return this.appLastUpdateModel
             .findOne({ documentId: AppLastUpdateDocumentId })
             .exec();
