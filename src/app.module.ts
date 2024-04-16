@@ -12,6 +12,9 @@ import { AppLastUpdateSchema } from './domain/schemas/app-lastupdate.schema';
 import { AppConfigurationRepository } from './infrastructure/repositories/app-configuration.repository';
 import { HttpModule } from '@nestjs/axios';
 import { BitbucketImplGateway } from './infrastructure/gateways/bitbucket-impl.gateway';
+import { SquadRepository } from './infrastructure/repositories/squad.repository';
+import GetSquadsImplUseCase from './application/usecases/get-squads-impl.usecase';
+import { SquadSchema } from './domain/schemas/squad.schema';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -42,6 +45,7 @@ export function loadConfig(): any {
         MongooseModule.forFeature([
             { name: 'projects', schema: ProjectSchema },
             { name: 'app-configurations', schema: AppLastUpdateSchema },
+            { name: 'squads', schema: SquadSchema }
         ]),
         UtilsModule,
         HttpModule,
@@ -58,6 +62,14 @@ export function loadConfig(): any {
             provide: 'BitbucketGateway',
             useClass: BitbucketImplGateway,
         },
+        {
+            provide: 'SquadRepository',
+            useClass: SquadRepository
+        },
+        {
+            provide: 'GetSquadsUseCase',
+            useClass: GetSquadsImplUseCase
+        }
     ],
 })
 export class AppModule {}

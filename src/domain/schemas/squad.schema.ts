@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
-
 @Schema()
-export class ProjectDocument extends Document {
+export class SquadDocument extends Document {
+
     @Prop()
     documentId: string;
 
@@ -11,7 +11,10 @@ export class ProjectDocument extends Document {
     name: string;
 
     @Prop()
-    group: string;
+    members: string[];
+
+    @Prop()
+    linkedProjects: string[];
 }
 
-export const ProjectSchema = SchemaFactory.createForClass(ProjectDocument);
+export const SquadSchema = SchemaFactory.createForClass(SquadDocument);

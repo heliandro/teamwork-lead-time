@@ -53,6 +53,8 @@ export class BitbucketImplGateway implements BitbucketGateway {
     async getProjects(): Promise<any[]> {
         const queryParameters = `?start=0&limit=${this.queryParamConfig.projectsLimit}`;
 
+        console.log('inicio - recuperando dados do bitbucket');
+
         const response = await this.httpService.axiosRef.get(
             `${this.url.repositories}${queryParameters}`,
             this.requestHeaders,

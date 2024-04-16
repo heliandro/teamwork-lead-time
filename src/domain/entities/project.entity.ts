@@ -1,12 +1,12 @@
 export class Project {
     private slug: string;
     private name: string;
-    private projectGroup: string;
+    private group: string;
 
-    constructor(slug: string, name: string, projectGroup: string) {
+    constructor(slug: string, name: string, group: string) {
         this.slug = slug;
         this.name = name;
-        this.projectGroup = projectGroup;
+        this.group = group;
     }
 
     getSlug(): string {
@@ -17,7 +17,7 @@ export class Project {
         return this.name;
     }
 
-    getProjectGroup(): string {
-        return this.projectGroup;
+    getGroup(): string {
+        return this.group;
     }
 }
