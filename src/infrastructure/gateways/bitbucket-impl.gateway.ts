@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { ConsoleLoggerService } from 'src/utils/services/console-logger.service';
 
 export interface BitbucketGateway {
     getProjects(): Promise<any>;
@@ -31,7 +32,9 @@ export class BitbucketImplGateway implements BitbucketGateway {
     constructor(
         private httpService: HttpService,
         private readonly configService: ConfigService,
+        @Inject('ConsoleLogger') private readonly logger: ConsoleLoggerService,
     ) {
+        this.logger.setContext(BitbucketImplGateway.name);
         this.env = {
             baseUrl: this.configService.get<string>('BITBUCKET_API_URL'),
             projectSlug: this.configService.get<string>(
@@ -39,7 +42,6 @@ export class BitbucketImplGateway implements BitbucketGateway {
             ),
             apiToken: this.configService.get<string>('BITBUCKET_API_TOKEN'),
         };
-        console.log(this.env);
         this.url = {
             repositories: `${this.env.baseUrl}/rest/api/latest/projects/${this.env.projectSlug}/repos`,
         };
@@ -51,20 +53,16 @@ export class BitbucketImplGateway implements BitbucketGateway {
     }
 
     async getProjects(): Promise<any[]> {
+        this.logger.log('recuperando projetos do bitbucket...');
         const queryParameters = `?start=0&limit=${this.queryParamConfig.projectsLimit}`;
-
-        console.log('inicio - recuperando dados do bitbucket');
 
         const response = await this.httpService.axiosRef.get(
             `${this.url.repositories}${queryParameters}`,
             this.requestHeaders,
         );
 
-        console.log(response.data.size);
-
         const projects = await this._getAllProjects(response);
-
-        console.log(response.data.values.length);
+        this.logger.log(`${projects.length} projetos do bitbucket foram recuperados com sucesso!`);
 
         return projects;
     }
@@ -76,12 +74,13 @@ export class BitbucketImplGateway implements BitbucketGateway {
             return projects;
         }
 
+        this.logger.log('a consulta está paginada, recuperando os demais projetos...');
+
         let isLastPage = false;
         let startPage = response.data.nextPageStart;
 
         while (!isLastPage) {
             const nextPageQueryParameters = `?start=${startPage}&limit=${this.queryParamConfig.projectsLimit}`;
-            console.log('nextPageQueryParameters', nextPageQueryParameters);
             const nextPageResponse = await this.httpService.axiosRef.get(
                 `${this.url.repositories}${nextPageQueryParameters}`,
                 this.requestHeaders,
@@ -91,7 +90,6 @@ export class BitbucketImplGateway implements BitbucketGateway {
             isLastPage = nextPageResponse.data.isLastPage;
             startPage = nextPageResponse.data.nextPageStart;
             const { values, ...resto } = nextPageResponse.data;
-            console.log(resto);
         }
 
         return projects;

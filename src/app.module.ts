@@ -16,6 +16,10 @@ import { SquadRepository } from './infrastructure/repositories/squad.repository'
 import GetSquadsImplUseCase from './application/usecases/get-squads-impl.usecase';
 import { SquadSchema } from './domain/schemas/squad.schema';
 import { GetAppLastUpdateImplUseCase } from './application/usecases/get-app-last-update-impl.usecase';
+import { DataLoaderBitbucketProjectsImplUseCase } from './application/usecases/data-loader-bitbucket-projects-impl.usecase';
+import { SetAppLastUpdateImplUseCase } from './application/usecases/set-app-last-update-impl.usecase';
+import { ProjectRepository } from './infrastructure/repositories/project.repository';
+import { SetProjectsImplUseCase } from './application/usecases/set-projects-impl.usecase';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -64,8 +68,16 @@ export function loadConfig(): any {
             useClass: GetAppLastUpdateImplUseCase,
         },
         {
+            provide: 'SetAppLastUpdateUseCase',
+            useClass: SetAppLastUpdateImplUseCase,
+        },
+        {
             provide: 'BitbucketGateway',
             useClass: BitbucketImplGateway,
+        },
+        {
+            provide: 'DataLoaderBitbucketProjectsUseCase',
+            useClass: DataLoaderBitbucketProjectsImplUseCase,
         },
         {
             provide: 'SquadRepository',
@@ -74,6 +86,14 @@ export function loadConfig(): any {
         {
             provide: 'GetSquadsUseCase',
             useClass: GetSquadsImplUseCase
+        },
+        {
+            provide: 'ProjectRepository',
+            useClass: ProjectRepository
+        },
+        {
+            provide: 'SetProjectsUseCase',
+            useClass: SetProjectsImplUseCase
         }
     ],
 })

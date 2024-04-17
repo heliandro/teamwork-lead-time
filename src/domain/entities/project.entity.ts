@@ -1,16 +1,16 @@
 export class Project {
-    private slug: string;
+    private documentId: string;
     private name: string;
     private group: string;
 
-    constructor(slug: string, name: string, group: string) {
-        this.slug = slug;
+    constructor(documentId: string, name: string, group: string) {
+        this.documentId = documentId;
         this.name = name;
         this.group = group;
     }
 
-    getSlug(): string {
-        return this.slug;
+    getDocumentId(): string {
+        return this.documentId;
     }
 
     getName(): string {
@@ -24,18 +24,18 @@ export class Project {
 
 export class ProjectBuilder {
 
-    private slug: string;
+    private documentId: string;
     private name: string;
     private group: string;
 
     constructor() {
-        this.slug = '';
+        this.documentId = '';
         this.name = '';
         this.group = '';
     }
 
-    withSlug(slug: string): ProjectBuilder {
-        this.slug = slug;
+    withDocumentId(documentId: string): ProjectBuilder {
+        this.documentId = documentId;
         return this;
     }
 
@@ -50,6 +50,6 @@ export class ProjectBuilder {
     }
 
     build(): Project {
-        return new Project(this.slug, this.name, this.group);
+        return new Project(this.documentId, this.name, this.group);
     }
 }

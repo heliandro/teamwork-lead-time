@@ -15,7 +15,7 @@ export class SquadRepository {
         return this.squadModel.find().exec();
     }
 
-    async getSquad(squadId: string): Promise<SquadDocument> {
+    async getSquadById(squadId: string): Promise<SquadDocument> {
         return this.squadModel.findOne({ documentId: squadId }).exec();
     }
 }

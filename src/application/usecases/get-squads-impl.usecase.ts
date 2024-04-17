@@ -26,7 +26,7 @@ export default class GetSquadsImplUseCase implements GetSquadsUseCase {
             return response;
         }
 
-        this.logger.log(`squads encontradas: ${response.size}`);
+        this.logger.log(`${response.size} squads encontradas no database`);
         return response;
     }
 }
