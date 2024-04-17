@@ -1,0 +1,21 @@
+import { Squad, SquadBuilder } from "src/domain/entities/squad.entity";
+import { SquadDocument } from "src/domain/schemas/squad.schema";
+
+export default class SquadDocumentsMapper {
+    static toSquads(squadDocuments: SquadDocument[]): Squad[] {
+
+        if (!squadDocuments.length) {
+            return [];
+        }
+
+        let response: Squad[] = squadDocuments.map((squadDocument: SquadDocument) => {
+            return new SquadBuilder()
+                .withDocumentId(squadDocument.documentId)
+                .withName(squadDocument.name)
+                .withLinkedProjects(squadDocument.linkedProjects)
+                .build()
+        });
+
+        return response;
+    }
+}

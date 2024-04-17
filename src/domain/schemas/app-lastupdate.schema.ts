@@ -13,6 +13,10 @@ export class AppLastUpdateDocument extends Document {
 
     @Prop()
     bambooLastUpdate: Date;
+
+    @Prop()
+    jiraLastUpdate: Date;
+    lastUpdate: string;
 }
 
 export const AppLastUpdateSchema = SchemaFactory.createForClass(

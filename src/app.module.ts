@@ -15,6 +15,7 @@ import { BitbucketImplGateway } from './infrastructure/gateways/bitbucket-impl.g
 import { SquadRepository } from './infrastructure/repositories/squad.repository';
 import GetSquadsImplUseCase from './application/usecases/get-squads-impl.usecase';
 import { SquadSchema } from './domain/schemas/squad.schema';
+import { GetAppLastUpdateImplUseCase } from './application/usecases/get-app-last-update-impl.usecase';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -57,6 +58,10 @@ export function loadConfig(): any {
         {
             provide: 'AppConfigurationRepository',
             useClass: AppConfigurationRepository,
+        },
+        {
+            provide: 'GetAppLastUpdateUseCase',
+            useClass: GetAppLastUpdateImplUseCase,
         },
         {
             provide: 'BitbucketGateway',

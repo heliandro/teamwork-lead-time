@@ -6,6 +6,9 @@ import { AppLastUpdateDocument } from 'src/domain/schemas/app-lastupdate.schema'
 import { BitbucketGateway } from '../gateways/bitbucket-impl.gateway';
 import GetSquadsUseCase from 'src/application/usecases/interfaces/get-squads.usecase';
 import { GetSquadsResponseSuccessDTO } from 'src/application/dtos/get-squads-response-success.dto';
+import { GetAppLastUpdateUseCase } from 'src/application/usecases/interfaces/get-app-last-update.usecase';
+import { GetAppLastUpdateResponseSuccessDTO } from 'src/application/dtos/get-app-last-update-response-success.dto';
+import { AppLastUpdate } from 'src/domain/entities/app-last-update.entity';
 
 @Injectable()
 export class MetricsDataLoaderScheduler {
@@ -16,8 +19,8 @@ export class MetricsDataLoaderScheduler {
     constructor(
         @Inject('ConsoleLogger')
         private readonly logger: ConsoleLoggerService,
-        @Inject('AppConfigurationRepository')
-        private readonly appConfigurationRepository: AppConfigurationRepository,
+        @Inject('GetAppLastUpdateUseCase')
+        private readonly getAppLastUpdateUseCase: GetAppLastUpdateUseCase,
         @Inject('BitbucketGateway')
         private readonly bitbucketGateway: BitbucketGateway,
         @Inject('GetSquadsUseCase')
@@ -34,47 +37,17 @@ export class MetricsDataLoaderScheduler {
 
     private async dataLoader() {
         try {
-            const appConfiguration = await this.appConfigurationRepository.getLastUpdate();
-            this._validateBitbucketIsUpdated(appConfiguration);
+            const appConfiguration: GetAppLastUpdateResponseSuccessDTO = await this.getAppLastUpdateUseCase.execute();
+            console.log(appConfiguration);
+            // this._validateBitbucketIsUpdated(appConfiguration.values);
             // TODO - this._validateBambooIsUpdated(appConfiguration);
-            this.runBitbucketDataLoader();
+            // this.runBitbucketDataLoader();
         } catch (error) {
             this.logger.error(`${error.message} - carga de dados cancelada!`);
         }
     }
 
     private async runBitbucketDataLoader() {
-        // TODO - OUTRO ESCOPO - CONFIGURACAO DA APLICACAO
-        // [x] 1 - DADOS DE CONFIGURACAO DA APLICACAO - REPOSITORY
-        // [ ] 2 - DADOS DE CONFIGURACAO DA APLICACAO - USECASE - ORQUESTRAR
-
-        // TODO - OUTRO ESCOPO - CADASTRO DE SQUADS - CONSULTA
-        // [x] 1 - CADASTRO DE TODAS AS SQUADS NO MONGODB AO INICIAR
-        // [x] 2 - SQUADS DO MONGO - USECASE - ORQUESTRAR
-        // [x] 3 - SQUADS DO MONGO - REPOSITORY
-
-
-        // TODO - IMPLEMENTAR CARGA DE DADOS
-        // [ ] 1 - BITBUCKET PROJECTS - USECASE - ORQUESTRAR
-        // [x] 2 - BITBUCKET PROJECTS - GATEWAY
-        // [ ] 3 - BITBUCKET PROJECTS - DTOS
-        // [ ] 4 - BITBUCKET PROJECTS - CRIAR MAPPER PARA DTO RESPONSE
-        // [ ] 5 - BITBUCKET PROJECTS - REPOSITORY - SALVAR E RECUPERAR DADOS
-
-        // [ ] 6 - BITBUCKET COMMITS - USECASE - ORQUESTRAR - AGRUPAR OS COMMITS POR HISTORIA
-        // [ ] 7 - BITBUCKET COMMITS - GATEWAY
-        // [ ] 8 - BITBUCKET COMMITS - DTOS
-        // [ ] 9 - BITBUCKET COMMITS - CRIAR MAPPER PARA DTO RESPONSE
-        // [ ] 10 - BITBUCKET COMMITS - REPOSITORY - SALVAR E RECUPERAR DADOS
-
-
-        // TODO - OUTRO ESCOPO - ENDPOINT -> ENTRADA: data-inicio, data-fim do range, filtro para 1..n squads
-        // [ ] 1 - LEAD TIME DAS SQUADS - USECASE - ORQUESTRAR -- USAR OS USECASES ANTERIORES + LOGICA
-        // [ ] 2 - LEAD TIME DAS SQUADS - GATEWAY
-        // [ ] 3 - LEAD TIME DAS SQUADS - DTOS
-        // [ ] 4 - LEAD TIME DAS SQUADS - CRIAR MAPPER PARA DTO RESPONSE
-        // [ ] 5 - LEAD TIME DAS SQUADS - REPOSITORY - SALVAR RELATORIO
-
         this.logger.log('carga dos dados de métricas iniciada!');
 
         const squads = await this.getSquadsUseCase.execute();
@@ -91,7 +64,7 @@ export class MetricsDataLoaderScheduler {
             // const projects = await new GetBitbucketProjectsUseCase.execute()
             // schema - projectId + os demais campos do commit a serem mapeados
             // await bitbucketCommitsRepository.save()
-            
+
         // TODO - implementar usecase para buscar todos os projetos relacionados aos seus commits do bitbucket no mongo
         // const commits = await new GetBitbucketProjectsWithCommitsUseCase.execute()
             // TODO - chamar internamente - composicao de usecases - commits + projects
@@ -103,16 +76,23 @@ export class MetricsDataLoaderScheduler {
 
         // TODO - atualizar data de última atualização do bitbucket e bamboo
         // this.appConfigurationRepository.saveLastUpdate(new Date(), null);
+
+        // TODO - OUTRO ESCOPO - ENDPOINT -> ENTRADA: data-inicio, data-fim do range, filtro para 1..n squads
+        // [ ] 1 - LEAD TIME DAS SQUADS - USECASE - ORQUESTRAR -- USAR OS USECASES ANTERIORES + LOGICA
+        // [ ] 2 - LEAD TIME DAS SQUADS - GATEWAY
+        // [ ] 3 - LEAD TIME DAS SQUADS - DTOS
+        // [ ] 4 - LEAD TIME DAS SQUADS - CRIAR MAPPER PARA DTO RESPONSE
+        // [ ] 5 - LEAD TIME DAS SQUADS - REPOSITORY - SALVAR RELATORIO
     }
 
-    private _validateBitbucketIsUpdated(appLastUpdateDocument: AppLastUpdateDocument) {
+    private _validateBitbucketIsUpdated(appLastUpdate: AppLastUpdate) {
         this.logger.log('validando data de última atualização do bitbucket...');
 
-        if (!appLastUpdateDocument?.bitbucketLastUpdate) {
+        if (!appLastUpdate.getBitbucketLastUpdate()) {
             throw new Error('não há data de última atualização do bitbucket no documento de app-configuration');
         }
 
-        let isValid = this._isLastUpdateValid(appLastUpdateDocument.bitbucketLastUpdate, this.bitbucketTimeToCheckInMinutes);
+        let isValid = this._isLastUpdateValid(appLastUpdate.getBitbucketLastUpdate(), this.bitbucketTimeToCheckInMinutes);
 
         if (!isValid) {
             this.logger.log('Os dados do bitbucket estão desatualizados - continuando carga de dados...');
@@ -140,5 +120,4 @@ export class MetricsDataLoaderScheduler {
             return;
         }
     }
-
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AppLastUpdateDocument, AppLastUpdateDocumentId } from 'src/domain/schemas/app-lastupdate.schema';
+import { AppLastUpdateDocument } from 'src/domain/schemas/app-lastupdate.schema';
 
 @Injectable()
 export class AppConfigurationRepository {
@@ -10,28 +10,21 @@ export class AppConfigurationRepository {
         private readonly appLastUpdateModel: Model<AppLastUpdateDocument>,
     ) {}
 
-    async saveLastUpdate(
-        bitbucketLastUpdate: Date,
-        bambooLastUpdate: Date,
-    ): Promise<AppLastUpdateDocument> {
-        const existingConfiguration = await this.getLastUpdate();
+    async save(
+        document: any
+    ): Promise<AppLastUpdateDocument | any> {
+        let existingConfiguration = await this.getDocumentById(document.documentId);
 
         if (existingConfiguration) {
-            existingConfiguration.bitbucketLastUpdate = bitbucketLastUpdate;
-            existingConfiguration.bambooLastUpdate = bambooLastUpdate;
+            existingConfiguration = { ...existingConfiguration, ...document };
             return existingConfiguration.save();
         }
 
-        const newConfiguration = new this.appLastUpdateModel({
-            bitbucketLastUpdate,
-            bambooLastUpdate,
-        });
+        const newConfiguration = new this.appLastUpdateModel(document);
         return newConfiguration.save();
     }
 
-    async getLastUpdate(): Promise<AppLastUpdateDocument> {
-        return this.appLastUpdateModel
-            .findOne({ documentId: AppLastUpdateDocumentId })
-            .exec();
+    async getDocumentById(documentId: string): Promise<AppLastUpdateDocument | any> {
+        return this.appLastUpdateModel.findOne({ documentId }).exec();
     }
 }

@@ -21,3 +21,35 @@ export class Project {
         return this.group;
     }
 }
+
+export class ProjectBuilder {
+
+    private slug: string;
+    private name: string;
+    private group: string;
+
+    constructor() {
+        this.slug = '';
+        this.name = '';
+        this.group = '';
+    }
+
+    withSlug(slug: string): ProjectBuilder {
+        this.slug = slug;
+        return this;
+    }
+
+    withName(name: string): ProjectBuilder {
+        this.name = name;
+        return this;
+    }
+
+    withGroup(group: string): ProjectBuilder {
+        this.group = group;
+        return this;
+    }
+
+    build(): Project {
+        return new Project(this.slug, this.name, this.group);
+    }
+}

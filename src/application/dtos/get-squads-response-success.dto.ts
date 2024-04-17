@@ -1,12 +1,13 @@
 import { Squad } from "src/domain/entities/squad.entity";
-import GetSquadsMapper from "../mappers/get-squads.mapper";
+import SquadDocumentsMapper from "../mappers/squad-documents.mapper";
+import { SquadDocument } from "src/domain/schemas/squad.schema";
 
 export class GetSquadsResponseSuccessDTO {
     values: Squad[];
     size: number;
 
-    constructor(squads: Squad[]) {
-        this.values = GetSquadsMapper.toGetSquadsResponseDTO(squads);
+    constructor(squadDocuments: SquadDocument[]) {
+        this.values = SquadDocumentsMapper.toSquads(squadDocuments);
         this.size = this.values.length;
     }
 }

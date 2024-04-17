@@ -18,10 +18,10 @@ export default class GetSquadsImplUseCase implements GetSquadsUseCase {
     async execute(): Promise<GetSquadsResponseSuccessDTO> {
         this.logger.log('iniciando busca de squads no database...');
         
-        const squads = await this.squadRepository.getAll();
-        const response = new GetSquadsResponseSuccessDTO(squads);
+        const squadsDocuments = await this.squadRepository.getAll();
+        const response = new GetSquadsResponseSuccessDTO(squadsDocuments);
 
-        if (!squads.length) {
+        if (!response.size) {
             this.logger.warn('não foram encontradas squads no database');
             return response;
         }

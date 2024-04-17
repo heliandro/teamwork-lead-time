@@ -41,22 +41,22 @@ export class SquadBuilder {
         this.linkedProjects = [];
     }
 
-    setDocumentId(documentId: string): SquadBuilder {
+    withDocumentId(documentId: string): SquadBuilder {
         this.documentId = documentId;
         return this;
     }
 
-    setName(name: string): SquadBuilder {
+    withName(name: string): SquadBuilder {
         this.name = name;
         return this;
     }
 
-    setMembers(members: string[]): SquadBuilder {
+    withMembers(members: string[]): SquadBuilder {
         this.members = members;
         return this;
     }
 
-    setLinkedProjects(linkedProjects: string[]): SquadBuilder {
+    withLinkedProjects(linkedProjects: string[]): SquadBuilder {
         this.linkedProjects = linkedProjects;
         return this;
     }

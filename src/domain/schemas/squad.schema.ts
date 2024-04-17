@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
+export const SquadDocumentId = 'your_squad_id';
 @Schema()
 export class SquadDocument extends Document {
 
-    @Prop()
+    @Prop({ unique: true, default: SquadDocumentId })
     documentId: string;
 
     @Prop()
