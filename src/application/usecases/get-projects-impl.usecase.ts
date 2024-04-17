@@ -21,7 +21,7 @@ export class GetProjectsImplUseCase implements GetProjectsUseCase {
         this.logger.log('iniciando busca dos projetos...');
         let projects = [];
 
-        if (input?.projectIds) {
+        if (input?.projectIds?.length > 0) {
             this.logger.log(`recuperando projetos pelos ids: ${input.projectIds}...`);
             for (const projectId of input.projectIds) {
                 const result = await this.projectsRepository.getProjectById(projectId);

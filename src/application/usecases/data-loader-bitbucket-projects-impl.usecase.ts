@@ -7,11 +7,15 @@ import { GetAppLastUpdateUseCase } from './interfaces/get-app-last-update.usecas
 import { SetAppLastUpdateUseCase } from './interfaces/set-app-last-update.usecase';
 import { SetAppLastUpdateRequestDTO } from '../dtos/set-app-last-update-request.dto';
 import { SetProjectsUseCase } from './interfaces/set-projects.usecase';
+import { GetSquadsResponseSuccessDTO } from '../dtos/get-squads-response-success.dto';
+import GetSquadsUseCase from './interfaces/get-squads.usecase';
 
 @Injectable()
 export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbucketProjectsUseCase {
     
     constructor(
+        @Inject('GetSquadsUseCase')
+        private readonly getSquadsUseCase: GetSquadsUseCase,
         @Inject('BitbucketGateway')
         private readonly bitbucketGateway: BitbucketGateway,
         @Inject('GetAppLastUpdateUseCase')
@@ -31,12 +35,14 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
         const appLastUpdateResponse: GetAppLastUpdateResponseSuccessDTO = await this.getAppLastUpdateUseCase.execute();
 
         this.logger.log('validando se a carga dos dados de projetos do bitbucket é necessária...');
-        if (appLastUpdateResponse.values.isBitbucketUpdated) {
+        if (appLastUpdateResponse.values.isBitbucketUpdated) { // TODO - refatorar para isBitbucketCommitsUpdated, isBitbucketProjectsUpdated
             this.logger.log('o bitbucket já foi atualizado, não é necessário realizar a carga dos dados de projetos do bitbucket!');
             return;
         }
 
-        const bitbucketProjects = await this.bitbucketGateway.getProjects();
+        const squads: GetSquadsResponseSuccessDTO = await this.getSquadsUseCase.execute();
+        const projectsIds = this._getProjectsIdsFromSquads(squads);
+        const bitbucketProjects = await this.bitbucketGateway.getProjects(projectsIds);
 
         await this.setProjectsUseCase.execute({ projects: bitbucketProjects });
 
@@ -45,5 +51,11 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
             bitbucketLastUpdate: new Date()
         }
         this.setAppLastUpdateUseCase.execute(setAppLastUpdateRequestDTO);
+    }
+
+    private _getProjectsIdsFromSquads(squads: GetSquadsResponseSuccessDTO): string[] {
+        return squads.values.reduce((acc, squad) => {
+            return [...acc, ...squad.getLinkedProjects().map((project: any) => project.name)];
+        }, []);
     }
 }

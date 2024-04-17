@@ -59,10 +59,38 @@ Authorization: Bearer {{AccessTokenBitbucket}}
 
 
 
+### BUSCAR REPOSITORIO
+GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}
+Authorization: Bearer {{AccessTokenBitbucket}}
+
+### BUSCAR REPOSITORIO default branch
+GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}/default-branch
+Authorization: Bearer {{AccessTokenBitbucket}}
+
+### BUSCAR REPOSITORIO BRANCHS
+GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}/branches
+Authorization: Bearer {{AccessTokenBitbucket}}
+
+### BUSCAR REPOSITORIO COMMITS
+GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}/commits
+Authorization: Bearer {{AccessTokenBitbucket}}
+
+### BUSCAR REPOSITORIO COMMITS ID
+GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}/commits/95dee3ef9a171e94d5f62826efd7c2cc8f6e801c
+Authorization: Bearer {{AccessTokenBitbucket}}
+
+### BUSCAR REPOSITORIO COMMITS - branch associada
+GET {{companyBitbucketURI}}/rest/branch-utils/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}/branches/info/95dee3ef9a171e94d5f62826efd7c2cc8f6e801c
+Authorization: Bearer {{AccessTokenBitbucket}}
+
+
+
+
+
 ### LISTAR COMMITS DO REPOSITORIO
 # @name reqListarCommitsRepositorio
 @limiteDeCommits = 300
-GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}/commits?start=0&limit={{limiteDeCommits}}
+GET {{companyBitbucketURI}}/rest/api/latest/projects/{{projectSlug}}/repos/{{repositorioSelecionado}}/commits?start=0&limit={{limiteDeCommits}}&branch=release-esteira
 Authorization: Bearer {{AccessTokenBitbucket}}
 ### RESPONSE
 @commitsDoRepositorio = {{reqListarCommitsRepositorio.response.body.$.}}

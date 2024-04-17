@@ -17,7 +17,7 @@ export class GetAppLastUpdateImplUseCase implements GetAppLastUpdateUseCase {
     }
 
     async execute(): Promise<GetAppLastUpdateResponseSuccessDTO> {
-        this.logger.log('iniciando busca do documento de appConfiguration para recuperar as informações de última atualização...');
+        this.logger.log('iniciando a busca do documento de configuração da aplicação para listar as informações de última atualização...');
         const lastUpdateDocument: AppLastUpdateDocument = await this.appConfigurationRepository.getAppLastUpdateById(AppLastUpdateDocumentId);
         this.logger.log('o documento de configuração da aplicação foi recuperado com sucesso!');
         

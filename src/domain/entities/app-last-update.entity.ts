@@ -5,7 +5,7 @@ export class AppLastUpdate {
     private bambooLastUpdate: Date;
     private jiraLastUpdate: Date;
 
-    private static timeToCheckInMinutes: number = 5;
+    private static timeToCheckInMinutes: number = 30;
 
     constructor(documentId: string, bitbucketLastUpdate: Date, bambooLastUpdate: Date, jiraLastUpdate: Date) {
         this.documentId = documentId;

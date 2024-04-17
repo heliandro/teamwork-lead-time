@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConsoleLoggerService } from 'src/utils/services/console-logger.service';
 
 export interface BitbucketGateway {
-    getProjects(): Promise<any>;
+    getProjects(ids?: string[]): Promise<any>;
     // getCommits(repository: string): Promise<string[]>;
 }
 
@@ -52,7 +52,7 @@ export class BitbucketImplGateway implements BitbucketGateway {
         };
     }
 
-    async getProjects(): Promise<any[]> {
+    async getProjects(ids?: string[]): Promise<any[]> {
         this.logger.log('recuperando projetos do bitbucket...');
         const queryParameters = `?start=0&limit=${this.queryParamConfig.projectsLimit}`;
 
@@ -61,7 +61,13 @@ export class BitbucketImplGateway implements BitbucketGateway {
             this.requestHeaders,
         );
 
-        const projects = await this._getAllProjects(response);
+        let projects = await this._getAllProjects(response);
+        console.log(projects[0])
+
+        if (ids?.length > 0) {
+            projects = projects.filter((project) => ids.includes(project.slug));
+        }
+
         this.logger.log(`${projects.length} projetos do bitbucket foram recuperados com sucesso!`);
 
         return projects;
