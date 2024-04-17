@@ -10,6 +10,7 @@ import { GetAppLastUpdateUseCase } from 'src/application/usecases/interfaces/get
 import { GetAppLastUpdateResponseSuccessDTO } from 'src/application/dtos/get-app-last-update-response-success.dto';
 import { AppLastUpdate } from 'src/domain/entities/app-last-update.entity';
 import { DataLoaderBitbucketProjectsUseCase } from 'src/application/usecases/interfaces/data-loader-bitbucket-projects.usecase';
+import { GetProjectsUseCase } from 'src/application/usecases/interfaces/get-projects.usecase';
 
 @Injectable()
 export class MetricsDataLoaderScheduler {
@@ -19,6 +20,9 @@ export class MetricsDataLoaderScheduler {
         private readonly logger: ConsoleLoggerService,
         @Inject('DataLoaderBitbucketProjectsUseCase')
         private readonly dataLoaderBitbucketProjectsUseCase: DataLoaderBitbucketProjectsUseCase,
+
+        @Inject('GetProjectsUseCase')
+        private readonly getProjectsUseCase: GetProjectsUseCase,
     ) {
         this.logger.setContext(MetricsDataLoaderScheduler.name);
         this.init();
@@ -41,6 +45,7 @@ export class MetricsDataLoaderScheduler {
         this.logger.log('scheduler de carga dos dados de métricas iniciada!');
 
         await this.dataLoaderBitbucketProjectsUseCase.execute();
+        await this.getProjectsUseCase.execute();
 
         // TODO - implementar usecase para buscar os projetos do bitbucket no mongo
         // const projects = await new GetProjectsUseCase.execute()

@@ -20,6 +20,7 @@ import { DataLoaderBitbucketProjectsImplUseCase } from './application/usecases/d
 import { SetAppLastUpdateImplUseCase } from './application/usecases/set-app-last-update-impl.usecase';
 import { ProjectRepository } from './infrastructure/repositories/project.repository';
 import { SetProjectsImplUseCase } from './application/usecases/set-projects-impl.usecase';
+import { GetProjectsImplUseCase } from './application/usecases/get-projects-impl.usecase';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -94,6 +95,10 @@ export function loadConfig(): any {
         {
             provide: 'SetProjectsUseCase',
             useClass: SetProjectsImplUseCase
+        },
+        {
+            provide: 'GetProjectsUseCase',
+            useClass: GetProjectsImplUseCase
         }
     ],
 })
