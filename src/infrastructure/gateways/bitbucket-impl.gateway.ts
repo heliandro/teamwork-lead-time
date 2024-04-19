@@ -6,7 +6,7 @@ import { ConsoleLoggerService } from 'src/utils/services/console-logger.service'
 
 export interface BitbucketGateway {
     getProjects(ids?: string[]): Promise<any[]>;
-    // getCommits(repository: string): Promise<string[]>;
+    getCommits(projectId: string): Promise<any>;
 }
 
 @Injectable()
@@ -35,6 +35,12 @@ export class BitbucketImplGateway implements BitbucketGateway {
         @Inject('ConsoleLogger') private readonly logger: ConsoleLoggerService,
     ) {
         this.logger.setContext(BitbucketImplGateway.name);
+        this.initEnv();
+        this.initUrl();
+        this.initRequestHeaders();
+    }
+
+    private initEnv() {
         this.env = {
             baseUrl: this.configService.get<string>('BITBUCKET_API_URL'),
             projectSlug: this.configService.get<string>(
@@ -42,9 +48,15 @@ export class BitbucketImplGateway implements BitbucketGateway {
             ),
             apiToken: this.configService.get<string>('BITBUCKET_API_TOKEN'),
         };
+    }
+
+    private initUrl() {
         this.url = {
             repositories: `${this.env.baseUrl}/rest/api/latest/projects/${this.env.projectSlug}/repos`,
         };
+    }
+
+    private initRequestHeaders() {
         this.requestHeaders = {
             headers: {
                 Authorization: `Bearer ${this.env.apiToken}`,
@@ -62,7 +74,6 @@ export class BitbucketImplGateway implements BitbucketGateway {
         );
 
         let projects = await this._getAllProjects(response);
-        console.log(projects[0])
 
         if (ids?.length > 0) {
             projects = projects.filter((project) => ids.includes(project.slug));
@@ -101,10 +112,17 @@ export class BitbucketImplGateway implements BitbucketGateway {
         return projects;
     }
 
-    // async getCommits(repository: string): Promise<any[]> {
-    //     const response: { data: any[] } = await this.httpService
-    //         .get(`${this.baseUrl}/repositories/${repository}/commits`)
-    //         .toPromise();
-    //     return response.data;
-    // }
+    async getCommits(repository: string): Promise<any> {
+        this.logger.log('recuperando commits do bitbucket...');
+        const queryParameters = `?limit=2000`;
+
+        const response = await this.httpService.axiosRef.get(
+            `${this.url.repositories}/${repository}/commits${queryParameters}`,
+            this.requestHeaders,
+        );
+
+        this.logger.log('commits do bitbucket recuperados com sucesso!');
+
+        return response.data;
+    }
 }

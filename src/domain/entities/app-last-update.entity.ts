@@ -1,7 +1,7 @@
 export class AppLastUpdate {
 
     private documentId: string;
-    private bitbucketProjectLastUpdate: Date;
+    private bitbucketProjectsLastUpdate: Date;
     private bitbucketCommitsLastUpdate: Date;
     private bambooLastUpdate: Date;
     private jiraLastUpdate: Date;
@@ -12,7 +12,7 @@ export class AppLastUpdate {
 
     constructor(documentId: string, bitbucketProjectsLastUpdate: Date, bitbucketCommitsLastUpdate: Date, bambooLastUpdate: Date, jiraLastUpdate: Date) {
         this.documentId = documentId;
-        this.bitbucketProjectLastUpdate = bitbucketProjectsLastUpdate;
+        this.bitbucketProjectsLastUpdate = bitbucketProjectsLastUpdate;
         this.bitbucketCommitsLastUpdate = bitbucketCommitsLastUpdate;
         this.bambooLastUpdate = bambooLastUpdate;
         this.jiraLastUpdate = jiraLastUpdate;
@@ -23,7 +23,7 @@ export class AppLastUpdate {
     }
 
     getBitbucketProjectsLastUpdate(): Date {
-        return this.bitbucketProjectLastUpdate;
+        return this.bitbucketProjectsLastUpdate;
     }
 
     getBitbucketCommitsLastUpdate(): Date {
@@ -39,7 +39,7 @@ export class AppLastUpdate {
     }
 
     isBitbucketProjectsUpdated(): boolean {
-        return this._calculateIfLastUpdateIsValid(this.bitbucketProjectLastUpdate, AppLastUpdate.bitbucketTimeToCheckInMinutes);
+        return this._calculateIfLastUpdateIsValid(this.bitbucketProjectsLastUpdate, AppLastUpdate.bitbucketTimeToCheckInMinutes);
     }
 
     isBitbucketCommitsUpdated(): boolean {

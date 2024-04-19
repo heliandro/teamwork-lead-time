@@ -40,6 +40,7 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
             const bitbucketProjects = await this.getBitbucketProjects(projectIds);
             await this.saveProjectsInDatabase(bitbucketProjects);
             await this.updateAppConfiguration(document);
+            this.logger.log('carga dos dados de projetos do bitbucket finalizada!');
         } catch (error) {
             this.logger.error(`${error.message}`);
         }
@@ -50,10 +51,10 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
         return appLastUpdateResponse.values;
     }
 
-    private async validateIfBitbucketProjectsUpdated(isBitbucketProjectsUpdated: boolean): Promise<void> {
+    private validateIfBitbucketProjectsUpdated(isBitbucketProjectsUpdated: boolean): void {
         this.logger.log('validando se a carga dos dados de projetos do bitbucket é necessária...');
         if (isBitbucketProjectsUpdated) {
-            throw new Error('o bitbucket já foi atualizado, não é necessário realizar a carga dos dados de projetos do bitbucket!');
+            throw Error('o bitbucket já foi atualizado, não é necessário realizar a carga dos dados de projetos do bitbucket!');
         }
     }
 

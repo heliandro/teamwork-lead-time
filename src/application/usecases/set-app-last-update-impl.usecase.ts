@@ -22,7 +22,12 @@ export class SetAppLastUpdateImplUseCase implements SetAppLastUpdateUseCase {
         const appLastUpdate = new AppLastUpdateBuilder()
             .withDocumentId(input.documentId)
             .withBitbucketProjectsLastUpdate(input.bitbucketProjectsLastUpdate)
+            .withBitbucketCommitsLastUpdate(input.bitbucketCommitsLastUpdate)
+            .withBambooLastUpdate(input.bambooLastUpdate)
+            .withJiraLastUpdate(input.jiraLastUpdate)
             .build();
+
+        console.log('applastupdate:::', appLastUpdate)
 
         await this.appConfigurationRepository.save(appLastUpdate);
     }

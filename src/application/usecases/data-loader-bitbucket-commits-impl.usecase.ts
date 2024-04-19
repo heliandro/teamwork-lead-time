@@ -10,6 +10,7 @@ import { SetAppLastUpdateUseCase } from "./interfaces/set-app-last-update.usecas
 import { AppLastUpdate } from "src/domain/entities/app-last-update.entity";
 import { Project } from "src/domain/entities/project.entity";
 import { SetAppLastUpdateRequestDTO } from "../dtos/set-app-last-update-request.dto";
+import { BitbucketGateway } from "src/infrastructure/gateways/bitbucket-impl.gateway";
 
 @Injectable()
 export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucketCommitsUseCase {
@@ -17,6 +18,8 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     constructor(
         @Inject('ConsoleLogger')
         private readonly logger: ConsoleLoggerService,
+        @Inject('BitbucketGateway')
+        private readonly bitbucketGateway: BitbucketGateway,
         @Inject('GetSquadsUseCase')
         private readonly getSquadsUseCase: GetSquadsUseCase,
         @Inject('GetProjectsUseCase')
@@ -36,12 +39,21 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
             this.validateIfBitbucketCommitsIsUpdated(isBitbucketCommitsUpdated);
             const projectIds = await this.getProjectsIdsFromSquads();
             const projects = await this.getProjectsFromDatabase(projectIds);
+            // TODO - Implementar fila de processamento para recuperar os commits de todos os projetos
+                /* TODO - USAR RABBITMQ
+                * 1. Criar uma fila de processamento para recuperar os commits dos projetos
+                * 2. Recuperar 1000 commits de um projeto por consumer e associar com o projectId + jiraKey + statusQueu = "Em Processamento"
+                * 3. Criar uma collection de commits e Salvar no mongodb
+                * 
+                * 4. Criar outra fila de processamento para recuperar as informações da branch de cada commit
+                * 5. Recuperar as informacoes do commit
+                * 6. Buscar no bitbucket as informações da branch associada ao commit
+                * 7. Associar as informações da branch com o commit + statusQue = "Finalizado"
+                * 8. Atualizar a collection de commits do mongodb
+                */
 
-            // TODO - implementar chamada para recuperar os commits do bitbucket via gateway
-            // schema - projectId + os demais campos do commit a serem mapeados
-            // const commitsDoProjeto = await new BitbucketGateway.getCommits(projectId)
-            // agrupar commits por historia do jira
-            // await CommitsRepository.save(commitsDoProjetoAgrupadosPorTaskJira)
+            // TODO - LEAD TIME - agrupar commits por jiraKey, pegar o primeiro commit e o último commit associado ao jiraKey e calcular o lead time
+            
         } catch (error) {
             this.logger.error(`${error.message}`);
         }
@@ -52,10 +64,10 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         return appLastUpdateResponse.values;
     }
 
-    private async validateIfBitbucketCommitsIsUpdated(isBitbucketCommitsUpdated: boolean): Promise<void> {
+    private validateIfBitbucketCommitsIsUpdated(isBitbucketCommitsUpdated: boolean): void {
         this.logger.log('validando se a carga dos dados de commits do bitbucket é necessária...');
         if (isBitbucketCommitsUpdated) {
-            throw new Error('o bitbucket já foi atualizado, não é necessário realizar a carga dos dados de commits do bitbucket!');
+            throw Error('o bitbucket já foi atualizado, não é necessário realizar a carga dos dados de commits do bitbucket!');
         }
     }
 
@@ -68,6 +80,11 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     private async getProjectsFromDatabase(projectIds: string[]): Promise<Project[]> {
         const projects = await this.getProjectsUseCase.execute({ projectIds });
         return projects.values;
+    }
+
+    private async getBitbucketCommits(projectIds: string[]): Promise<any> {
+        const bitbucketCommits = await this.bitbucketGateway.getCommits(projectIds[0]);
+        return bitbucketCommits;
     }
 
     private async updateAppConfiguration(document: AppLastUpdate): Promise<void> {
