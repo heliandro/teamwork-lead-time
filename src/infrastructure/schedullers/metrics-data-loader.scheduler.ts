@@ -1,14 +1,6 @@
-import { Injectable, Inject, Get } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConsoleLoggerService } from 'src/utils/services/console-logger.service';
-import { AppConfigurationRepository } from '../repositories/app-configuration.repository';
-import { AppLastUpdateDocument } from 'src/domain/schemas/app-lastupdate.schema';
-import { BitbucketGateway } from '../gateways/bitbucket-impl.gateway';
-import GetSquadsUseCase from 'src/application/usecases/interfaces/get-squads.usecase';
-import { GetSquadsResponseSuccessDTO } from 'src/application/dtos/get-squads-response-success.dto';
-import { GetAppLastUpdateUseCase } from 'src/application/usecases/interfaces/get-app-last-update.usecase';
-import { GetAppLastUpdateResponseSuccessDTO } from 'src/application/dtos/get-app-last-update-response-success.dto';
-import { AppLastUpdate } from 'src/domain/entities/app-last-update.entity';
 import { DataLoaderBitbucketProjectsUseCase } from 'src/application/usecases/interfaces/data-loader-bitbucket-projects.usecase';
 import { GetProjectsUseCase } from 'src/application/usecases/interfaces/get-projects.usecase';
 import { DataLoaderBitbucketCommitsUseCase } from 'src/application/usecases/interfaces/data-loader-bitbucket-commits.usecase';
@@ -23,8 +15,6 @@ export class MetricsDataLoaderScheduler {
         private readonly dataLoaderBitbucketProjectsUseCase: DataLoaderBitbucketProjectsUseCase,
         @Inject('DataLoaderBitbucketCommitsUseCase')
         private readonly dataLoaderBitbucketCommitsUseCase: DataLoaderBitbucketCommitsUseCase,
-        @Inject('GetProjectsUseCase')
-        private readonly getProjectsUseCase: GetProjectsUseCase,
     ) {
         this.logger.setContext(MetricsDataLoaderScheduler.name);
         this.init();
@@ -44,22 +34,13 @@ export class MetricsDataLoaderScheduler {
     }
 
     private async runDataLoader() {
-        this.logger.log('scheduler de carga dos dados de métricas iniciada!');
-
-        await this.dataLoaderBitbucketProjectsUseCase.execute();
-        await this.dataLoaderBitbucketCommitsUseCase.execute();
-
-        // TODO - implementar usecase para recuperar os commits do bitcket e salvar no mongo
-        // await new DataLoaderBitbucketCommitsForProjectsUseCase.execute()
-
-            // TODO - composicao - projects + data commits
-            // const projects = await new GetProjectsUseCase.execute()
-            // schema - projectId + os demais campos do commit a serem mapeados
-            // const commitsDoProjeto = await new BitbucketGateway.getCommits(projectId)
-            // agrupar commits por historia do jira
-            // await CommitsRepository.save(commitsDoProjetoAgrupadosPorTaskJira)
-
-        // TODO - OUTRO ESCOPO - ENDPOINT -> ENTRADA: data-inicio, data-fim do range, filtro para 1..n squads
-        // [ ] LEAD TIME DAS SQUADS - USECASE - ORQUESTRAR -- USAR OS USECASES ANTERIORES + LOGICA
+        try {
+            this.logger.log('scheduler de carga dos dados de métricas iniciada!');
+            await this.dataLoaderBitbucketProjectsUseCase.execute();
+            await this.dataLoaderBitbucketCommitsUseCase.execute();
+            this.logger.log('scheduler de carga dos dados de métricas finalizada!');
+        } catch (error) {
+            this.logger.error(`scheduler de carga dos dados de métricas finalizada com erro: ${error.message}`);
+        }
     }
 }

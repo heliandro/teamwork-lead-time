@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConsoleLoggerService } from 'src/utils/services/console-logger.service';
 
 export interface BitbucketGateway {
-    getProjects(ids?: string[]): Promise<any>;
+    getProjects(ids?: string[]): Promise<any[]>;
     // getCommits(repository: string): Promise<string[]>;
 }
 

@@ -10,7 +10,7 @@ export class AppLastUpdateDocumentMapper {
 
         return new AppLastUpdateBuilder()
             .withDocumentId(appLastUpdateDocument.documentId)
-            .withBitbucketLastUpdate(appLastUpdateDocument?.bitbucketLastUpdate || null)
+            .withBitbucketProjectsLastUpdate(appLastUpdateDocument?.bitbucketProjectsLastUpdate || null)
             .withBambooLastUpdate(appLastUpdateDocument?.bambooLastUpdate || null)
             .withJiraLastUpdate(appLastUpdateDocument?.jiraLastUpdate || null)
             .build();

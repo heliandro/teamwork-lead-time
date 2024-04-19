@@ -21,7 +21,7 @@ export class SetAppLastUpdateImplUseCase implements SetAppLastUpdateUseCase {
         this.logger.log('salvando as datas de última atualização dos serviços no database...');
         const appLastUpdate = new AppLastUpdateBuilder()
             .withDocumentId(input.documentId)
-            .withBitbucketLastUpdate(input.bitbucketLastUpdate)
+            .withBitbucketProjectsLastUpdate(input.bitbucketProjectsLastUpdate)
             .build();
 
         await this.appConfigurationRepository.save(appLastUpdate);

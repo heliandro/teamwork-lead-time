@@ -6,7 +6,8 @@ export class GetAppLastUpdateResponseSuccessDTO {
 
     values: {
         document: AppLastUpdate,
-        isBitbucketUpdated: boolean,
+        isBitbucketProjectsUpdated: boolean,
+        isBitbucketCommitsUpdated: boolean,
         isBambooUpdated: boolean,
         isJiraUpdated: boolean,
     }
@@ -15,7 +16,8 @@ export class GetAppLastUpdateResponseSuccessDTO {
         const document = AppLastUpdateDocumentMapper.toAppLastUpdate(appLastUpdateDocument);
         this.values = {
             document,
-            isBitbucketUpdated: document.isBitbucketUpdated(),
+            isBitbucketProjectsUpdated: document.isBitbucketProjectsUpdated(),
+            isBitbucketCommitsUpdated: document.isBitbucketCommitsUpdated(),
             isBambooUpdated: document.isBambooUpdated(),
             isJiraUpdated: document.isJiraUpdated(),
         }

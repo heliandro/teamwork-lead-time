@@ -9,6 +9,7 @@ import { SetAppLastUpdateRequestDTO } from '../dtos/set-app-last-update-request.
 import { SetProjectsUseCase } from './interfaces/set-projects.usecase';
 import { GetSquadsResponseSuccessDTO } from '../dtos/get-squads-response-success.dto';
 import GetSquadsUseCase from './interfaces/get-squads.usecase';
+import { AppLastUpdate } from 'src/domain/entities/app-last-update.entity';
 
 @Injectable()
 export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbucketProjectsUseCase {
@@ -31,26 +32,52 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
     }
 
     async execute(): Promise<void> {
-        this.logger.log('carga dos dados de projetos do bitbucket iniciada!');
+        try {
+            this.logger.log('carga dos dados de projetos do bitbucket iniciada!');
+            const { isBitbucketProjectsUpdated, document } = await this.getAppConfiguration();
+            this.validateIfBitbucketProjectsUpdated(isBitbucketProjectsUpdated);
+            const projectIds = await this.getProjectsIdsFromSquads()
+            const bitbucketProjects = await this.getBitbucketProjects(projectIds);
+            await this.saveProjectsInDatabase(bitbucketProjects);
+            await this.updateAppConfiguration(document);
+        } catch (error) {
+            this.logger.error(`${error.message}`);
+        }
+    }
+
+    private async getAppConfiguration(): Promise<{ document: AppLastUpdate, isBitbucketProjectsUpdated: boolean }> {
         const appLastUpdateResponse: GetAppLastUpdateResponseSuccessDTO = await this.getAppLastUpdateUseCase.execute();
+        return appLastUpdateResponse.values;
+    }
 
+    private async validateIfBitbucketProjectsUpdated(isBitbucketProjectsUpdated: boolean): Promise<void> {
         this.logger.log('validando se a carga dos dados de projetos do bitbucket é necessária...');
-        if (appLastUpdateResponse.values.isBitbucketUpdated) { // TODO - refatorar para isBitbucketCommitsUpdated, isBitbucketProjectsUpdated
-            this.logger.log('o bitbucket já foi atualizado, não é necessário realizar a carga dos dados de projetos do bitbucket!');
-            return;
+        if (isBitbucketProjectsUpdated) {
+            throw new Error('o bitbucket já foi atualizado, não é necessário realizar a carga dos dados de projetos do bitbucket!');
         }
+    }
 
+    private async getProjectsIdsFromSquads(): Promise<string[]> {
         const squads: GetSquadsResponseSuccessDTO = await this.getSquadsUseCase.execute();
-        const projectsIds = this._getProjectsIdsFromSquads(squads);
-        const bitbucketProjects = await this.bitbucketGateway.getProjects(projectsIds);
+        const projectIds = this._getProjectsIdsFromSquads(squads);
+        return projectIds;
+    }
 
+    private async getBitbucketProjects(projectIds: string[]): Promise<any[]> {
+        const bitbucketProjects = await this.bitbucketGateway.getProjects(projectIds);
+        return bitbucketProjects;
+    }
+
+    private async saveProjectsInDatabase(bitbucketProjects: any[]): Promise<void> {
         await this.setProjectsUseCase.execute({ projects: bitbucketProjects });
+    }
 
+    private async updateAppConfiguration(document: AppLastUpdate): Promise<void> {
         const setAppLastUpdateRequestDTO: SetAppLastUpdateRequestDTO = {
-            documentId: appLastUpdateResponse.values.document.getDocumentId(),
-            bitbucketLastUpdate: new Date()
+            documentId: document.getDocumentId(),
+            bitbucketProjectsLastUpdate: new Date()
         }
-        this.setAppLastUpdateUseCase.execute(setAppLastUpdateRequestDTO);
+        await this.setAppLastUpdateUseCase.execute(setAppLastUpdateRequestDTO);
     }
 
     private _getProjectsIdsFromSquads(squads: GetSquadsResponseSuccessDTO): string[] {

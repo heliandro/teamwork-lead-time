@@ -9,14 +9,16 @@ export class AppLastUpdateDocument extends Document {
     documentId: string;
 
     @Prop()
-    bitbucketLastUpdate: Date;
+    bitbucketProjectsLastUpdate: Date;
+
+    @Prop()
+    bitbucketCommitsLastUpdate: Date;
 
     @Prop()
     bambooLastUpdate: Date;
 
     @Prop()
     jiraLastUpdate: Date;
-    lastUpdate: string;
 }
 
 export const AppLastUpdateSchema = SchemaFactory.createForClass(
