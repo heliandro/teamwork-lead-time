@@ -4,12 +4,12 @@ import { GetProjectsUseCase } from "./interfaces/get-projects.usecase";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
 import GetSquadsUseCase from "./interfaces/get-squads.usecase";
 import { GetSquadsResponseSuccessDTO } from "../dtos/get-squads-response-success.dto";
-import { GetAppLastUpdateResponseSuccessDTO } from "../dtos/get-app-last-update-response-success.dto";
-import { GetAppLastUpdateUseCase } from "./interfaces/get-app-last-update.usecase";
-import { SetAppLastUpdateUseCase } from "./interfaces/set-app-last-update.usecase";
-import { AppLastUpdate } from "src/domain/entities/app-last-update.entity";
+import { GetAppUpdateConfigOutputSuccessDTO } from "../dtos/get-app-update-config-output-success.dto";
+import { GetAppUpdateConfigUseCase } from "./interfaces/get-app-update-config.usecase";
+import { SetAppUpdateConfigUseCase } from "./interfaces/set-app-update-config.usecase";
+import { AppUpdateConfig } from "src/domain/entities/app-update-config.entity";
 import { Project } from "src/domain/entities/project.entity";
-import { SetAppLastUpdateRequestDTO } from "../dtos/set-app-last-update-request.dto";
+import { SetAppUpdateConfigInputDTO } from "../dtos/set-app-update-config-input.dto";
 import { BitbucketGateway } from "src/infrastructure/gateways/bitbucket-impl.gateway";
 
 @Injectable()
@@ -25,9 +25,9 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         @Inject('GetProjectsUseCase')
         private readonly getProjectsUseCase: GetProjectsUseCase,
         @Inject('GetAppLastUpdateUseCase')
-        private readonly getAppLastUpdateUseCase: GetAppLastUpdateUseCase,
+        private readonly getAppLastUpdateUseCase: GetAppUpdateConfigUseCase,
         @Inject('SetAppLastUpdateUseCase')
-        private readonly setAppLastUpdateUseCase: SetAppLastUpdateUseCase,
+        private readonly setAppLastUpdateUseCase: SetAppUpdateConfigUseCase,
     ) {
         this.logger.setContext(DataLoaderBitbucketCommitsImplUseCase.name);
     }
@@ -59,8 +59,8 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         }
     }
 
-    private async getAppConfiguration(): Promise<{ document: AppLastUpdate, isBitbucketCommitsUpdated: boolean }> {
-        const appLastUpdateResponse: GetAppLastUpdateResponseSuccessDTO = await this.getAppLastUpdateUseCase.execute();
+    private async getAppConfiguration(): Promise<{ document: AppUpdateConfig, isBitbucketCommitsUpdated: boolean }> {
+        const appLastUpdateResponse: GetAppUpdateConfigOutputSuccessDTO = await this.getAppLastUpdateUseCase.execute();
         return appLastUpdateResponse.values;
     }
 
@@ -87,8 +87,8 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         return bitbucketCommits;
     }
 
-    private async updateAppConfiguration(document: AppLastUpdate): Promise<void> {
-        const setAppLastUpdateRequestDTO: SetAppLastUpdateRequestDTO = {
+    private async updateAppConfiguration(document: AppUpdateConfig): Promise<void> {
+        const setAppLastUpdateRequestDTO: SetAppUpdateConfigInputDTO = {
             documentId: document.getDocumentId(),
             bitbucketCommitsLastUpdate: new Date()
         }

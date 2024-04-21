@@ -8,16 +8,16 @@ import { MetricsDataLoaderScheduler } from './infrastructure/schedullers/metrics
 import { ScheduleModule } from '@nestjs/schedule';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProjectSchema } from './domain/schemas/project.schema';
-import { AppLastUpdateSchema } from './domain/schemas/app-lastupdate.schema';
+import { AppUpdateConfigSchema } from './domain/schemas/app-update-config.schema';
 import { AppConfigurationRepository } from './infrastructure/repositories/app-configuration.repository';
 import { HttpModule } from '@nestjs/axios';
 import { BitbucketImplGateway } from './infrastructure/gateways/bitbucket-impl.gateway';
 import { SquadRepository } from './infrastructure/repositories/squad.repository';
 import GetSquadsImplUseCase from './application/usecases/get-squads-impl.usecase';
 import { SquadSchema } from './domain/schemas/squad.schema';
-import { GetAppLastUpdateImplUseCase } from './application/usecases/get-app-last-update-impl.usecase';
+import { GetAppUpdateConfigImplUseCase } from './application/usecases/get-app-update-config-impl.usecase';
 import { DataLoaderBitbucketProjectsImplUseCase } from './application/usecases/data-loader-bitbucket-projects-impl.usecase';
-import { SetAppLastUpdateImplUseCase } from './application/usecases/set-app-last-update-impl.usecase';
+import { SetAppUpdateConfigImplUseCase } from './application/usecases/set-app-update-config-impl.usecase';
 import { ProjectRepository } from './infrastructure/repositories/project.repository';
 import { SetProjectsImplUseCase } from './application/usecases/set-projects-impl.usecase';
 import { GetProjectsImplUseCase } from './application/usecases/get-projects-impl.usecase';
@@ -53,7 +53,7 @@ export function loadConfig(): any {
         MongooseModule.forRoot(process.env.MONGODB_CONNECTION_STRING),
         MongooseModule.forFeature([
             { name: 'projects', schema: ProjectSchema },
-            { name: 'app-configurations', schema: AppLastUpdateSchema },
+            { name: 'app_configurations', schema: AppUpdateConfigSchema },
             { name: 'squads', schema: SquadSchema }
         ]),
         RabbitMQModule.forRoot(RabbitMQModule, {
@@ -85,11 +85,11 @@ export function loadConfig(): any {
         },
         {
             provide: 'GetAppLastUpdateUseCase',
-            useClass: GetAppLastUpdateImplUseCase,
+            useClass: GetAppUpdateConfigImplUseCase,
         },
         {
             provide: 'SetAppLastUpdateUseCase',
-            useClass: SetAppLastUpdateImplUseCase,
+            useClass: SetAppUpdateConfigImplUseCase,
         },
         {
             provide: 'BitbucketGateway',

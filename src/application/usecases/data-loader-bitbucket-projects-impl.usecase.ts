@@ -2,14 +2,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DataLoaderBitbucketProjectsUseCase } from "./interfaces/data-loader-bitbucket-projects.usecase";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
 import { BitbucketGateway } from "src/infrastructure/gateways/bitbucket-impl.gateway";
-import { GetAppLastUpdateResponseSuccessDTO } from "../dtos/get-app-last-update-response-success.dto";
-import { GetAppLastUpdateUseCase } from './interfaces/get-app-last-update.usecase';
-import { SetAppLastUpdateUseCase } from './interfaces/set-app-last-update.usecase';
-import { SetAppLastUpdateRequestDTO } from '../dtos/set-app-last-update-request.dto';
+import { GetAppUpdateConfigOutputSuccessDTO } from "../dtos/get-app-update-config-output-success.dto";
+import { GetAppUpdateConfigUseCase } from './interfaces/get-app-update-config.usecase';
+import { SetAppUpdateConfigUseCase } from './interfaces/set-app-update-config.usecase';
+import { SetAppUpdateConfigInputDTO } from '../dtos/set-app-update-config-input.dto';
 import { SetProjectsUseCase } from './interfaces/set-projects.usecase';
 import { GetSquadsResponseSuccessDTO } from '../dtos/get-squads-response-success.dto';
 import GetSquadsUseCase from './interfaces/get-squads.usecase';
-import { AppLastUpdate } from 'src/domain/entities/app-last-update.entity';
+import { AppUpdateConfig } from 'src/domain/entities/app-update-config.entity';
 
 @Injectable()
 export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbucketProjectsUseCase {
@@ -20,9 +20,9 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
         @Inject('BitbucketGateway')
         private readonly bitbucketGateway: BitbucketGateway,
         @Inject('GetAppLastUpdateUseCase')
-        private readonly getAppLastUpdateUseCase: GetAppLastUpdateUseCase,
+        private readonly getAppLastUpdateUseCase: GetAppUpdateConfigUseCase,
         @Inject('SetAppLastUpdateUseCase')
-        private readonly setAppLastUpdateUseCase: SetAppLastUpdateUseCase,
+        private readonly setAppLastUpdateUseCase: SetAppUpdateConfigUseCase,
         @Inject('SetProjectsUseCase')
         private readonly setProjectsUseCase: SetProjectsUseCase,
         @Inject('ConsoleLogger')
@@ -46,8 +46,8 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
         }
     }
 
-    private async getAppConfiguration(): Promise<{ document: AppLastUpdate, isBitbucketProjectsUpdated: boolean }> {
-        const appLastUpdateResponse: GetAppLastUpdateResponseSuccessDTO = await this.getAppLastUpdateUseCase.execute();
+    private async getAppConfiguration(): Promise<{ document: AppUpdateConfig, isBitbucketProjectsUpdated: boolean }> {
+        const appLastUpdateResponse: GetAppUpdateConfigOutputSuccessDTO = await this.getAppLastUpdateUseCase.execute();
         return appLastUpdateResponse.values;
     }
 
@@ -73,8 +73,8 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
         await this.setProjectsUseCase.execute({ projects: bitbucketProjects });
     }
 
-    private async updateAppConfiguration(document: AppLastUpdate): Promise<void> {
-        const setAppLastUpdateRequestDTO: SetAppLastUpdateRequestDTO = {
+    private async updateAppConfiguration(document: AppUpdateConfig): Promise<void> {
+        const setAppLastUpdateRequestDTO: SetAppUpdateConfigInputDTO = {
             documentId: document.getDocumentId(),
             bitbucketProjectsLastUpdate: new Date()
         }

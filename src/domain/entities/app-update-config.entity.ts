@@ -1,4 +1,4 @@
-export class AppLastUpdate {
+export class AppUpdateConfig {
 
     private documentId: string;
     private bitbucketProjectsLastUpdate: Date;
@@ -39,19 +39,19 @@ export class AppLastUpdate {
     }
 
     isBitbucketProjectsUpdated(): boolean {
-        return this._calculateIfLastUpdateIsValid(this.bitbucketProjectsLastUpdate, AppLastUpdate.bitbucketTimeToCheckInMinutes);
+        return this._calculateIfLastUpdateIsValid(this.bitbucketProjectsLastUpdate, AppUpdateConfig.bitbucketTimeToCheckInMinutes);
     }
 
     isBitbucketCommitsUpdated(): boolean {
-        return this._calculateIfLastUpdateIsValid(this.bitbucketCommitsLastUpdate, AppLastUpdate.bitbucketTimeToCheckInMinutes);
+        return this._calculateIfLastUpdateIsValid(this.bitbucketCommitsLastUpdate, AppUpdateConfig.bitbucketTimeToCheckInMinutes);
     }
 
     isBambooUpdated(): boolean {
-        return this._calculateIfLastUpdateIsValid(this.bambooLastUpdate, AppLastUpdate.bambooTimeToCheckInMinutes);
+        return this._calculateIfLastUpdateIsValid(this.bambooLastUpdate, AppUpdateConfig.bambooTimeToCheckInMinutes);
     }
 
     isJiraUpdated(): boolean {
-        return this._calculateIfLastUpdateIsValid(this.jiraLastUpdate, AppLastUpdate.jiraTimeToCheckInMinutes);
+        return this._calculateIfLastUpdateIsValid(this.jiraLastUpdate, AppUpdateConfig.jiraTimeToCheckInMinutes);
     }
 
     private _calculateIfLastUpdateIsValid(lastUpdate: Date, timeToCheckInMinutes: number): boolean {
@@ -69,7 +69,7 @@ export class AppLastUpdate {
     }
 }
 
-export class AppLastUpdateBuilder {
+export class AppUpdateConfigBuilder {
 
     private documentId: string;
     private bitbucketProjectsLastUpdate: Date;
@@ -85,32 +85,32 @@ export class AppLastUpdateBuilder {
         this.jiraLastUpdate = null;
     }
 
-    withDocumentId(documentId: string): AppLastUpdateBuilder {
+    withDocumentId(documentId: string): AppUpdateConfigBuilder {
         this.documentId = documentId;
         return this;
     }
 
-    withBitbucketProjectsLastUpdate(bitbucketProjectsLastUpdate: Date): AppLastUpdateBuilder {
+    withBitbucketProjectsLastUpdate(bitbucketProjectsLastUpdate: Date): AppUpdateConfigBuilder {
         this.bitbucketProjectsLastUpdate = bitbucketProjectsLastUpdate;
         return this;
     }
 
-    withBitbucketCommitsLastUpdate(bitbucketCommitsLastUpdate: Date): AppLastUpdateBuilder {
+    withBitbucketCommitsLastUpdate(bitbucketCommitsLastUpdate: Date): AppUpdateConfigBuilder {
         this.bitbucketCommitsLastUpdate = bitbucketCommitsLastUpdate;
         return this;
     }
 
-    withBambooLastUpdate(bambooLastUpdate: Date): AppLastUpdateBuilder {
+    withBambooLastUpdate(bambooLastUpdate: Date): AppUpdateConfigBuilder {
         this.bambooLastUpdate = bambooLastUpdate;
         return this;
     }
 
-    withJiraLastUpdate(jiraLastUpdate: Date): AppLastUpdateBuilder {
+    withJiraLastUpdate(jiraLastUpdate: Date): AppUpdateConfigBuilder {
         this.jiraLastUpdate = jiraLastUpdate;
         return this;
     }
 
-    build(): AppLastUpdate {
-        return new AppLastUpdate(this.documentId, this.bitbucketProjectsLastUpdate, this.bitbucketCommitsLastUpdate, this.bambooLastUpdate, this.jiraLastUpdate);
+    build(): AppUpdateConfig {
+        return new AppUpdateConfig(this.documentId, this.bitbucketProjectsLastUpdate, this.bitbucketCommitsLastUpdate, this.bambooLastUpdate, this.jiraLastUpdate);
     }
 }

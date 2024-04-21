@@ -11,8 +11,18 @@ db.createUser({
   roles: [{ role: "readWrite", db: "company_metrics" }]
 })
 
-db.createCollection("squads")
+db.createCollection("app_configurations")
+db.app_configurations.insert(
+    {
+        documentId: "app_update_config",
+        bitbucketProjectsLastUpdate: null,
+        bitbucketCommitsLastUpdate: null,
+        bambooLastUpdate: null,
+        jiraLastUpdate: null,
+    }
+);
 
+db.createCollection("squads")
 db.squads.insertMany([
     { 
         documentId: "grecia",

@@ -5,8 +5,8 @@ import { Project } from "src/domain/entities/project.entity";
 import { ProjectRepository } from "src/infrastructure/repositories/project.repository";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
 import { BitbucketProjectsMapper } from "../mappers/bitbucket-projects.mapper";
-import { SetAppLastUpdateRequestDTO } from "../dtos/set-app-last-update-request.dto";
-import { GetAppLastUpdateResponseSuccessDTO } from "../dtos/get-app-last-update-response-success.dto";
+import { SetAppUpdateConfigInputDTO } from "../dtos/set-app-update-config-input.dto";
+import { GetAppUpdateConfigOutputSuccessDTO } from "../dtos/get-app-update-config-output-success.dto";
 
 @Injectable()
 export class SetProjectsImplUseCase implements SetProjectsUseCase {

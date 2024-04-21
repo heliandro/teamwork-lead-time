@@ -1,31 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AppLastUpdate } from 'src/domain/entities/app-last-update.entity';
-import { AppLastUpdateDocument } from 'src/domain/schemas/app-lastupdate.schema';
+import { AppUpdateConfig } from 'src/domain/entities/app-update-config.entity';
+import { AppUpdateConfigDocument } from 'src/domain/schemas/app-update-config.schema';
 
 @Injectable()
 export class AppConfigurationRepository {
     constructor(
-        @InjectModel('app-configurations')
-        private readonly appLastUpdateModel: Model<AppLastUpdateDocument>,
+        @InjectModel('app_configurations')
+        private readonly appUpdateConfigModel: Model<AppUpdateConfigDocument>,
     ) {}
 
     async save(
-        appLastUpdate: AppLastUpdate
-    ): Promise<AppLastUpdateDocument> {
-        let existingConfiguration = await this.getAppLastUpdateById(appLastUpdate.getDocumentId());
+        appUpdateConfig: AppUpdateConfig
+    ): Promise<AppUpdateConfigDocument> {
+        let existingConfiguration = await this.getAppUpdateConfigById(appUpdateConfig.getDocumentId());
 
         if (existingConfiguration) {
-            existingConfiguration.set(appLastUpdate)
+            existingConfiguration.set(appUpdateConfig)
             return existingConfiguration.save();
         }
 
-        const newConfiguration = new this.appLastUpdateModel(appLastUpdate);
+        const newConfiguration = new this.appUpdateConfigModel(appUpdateConfig);
         return newConfiguration.save();
     }
 
-    async getAppLastUpdateById(documentId: string): Promise<AppLastUpdateDocument> {
-        return this.appLastUpdateModel.findOne({ documentId }).exec();
+    async getAppUpdateConfigById(documentId: string): Promise<AppUpdateConfigDocument> {
+        return this.appUpdateConfigModel.findOne({ documentId }).exec();
     }
 }

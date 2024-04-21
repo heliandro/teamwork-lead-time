@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export const AppLastUpdateDocumentId = 'last_update';
+export const AppUpdateConfigDocumentId = 'app_update_config';
 
 @Schema()
-export class AppLastUpdateDocument extends Document {
-    @Prop({ unique: true, default: AppLastUpdateDocumentId })
+export class AppUpdateConfigDocument extends Document {
+    @Prop({ unique: true, default: AppUpdateConfigDocumentId })
     documentId: string;
 
     @Prop()
@@ -21,6 +21,6 @@ export class AppLastUpdateDocument extends Document {
     jiraLastUpdate: Date;
 }
 
-export const AppLastUpdateSchema = SchemaFactory.createForClass(
-    AppLastUpdateDocument,
+export const AppUpdateConfigSchema = SchemaFactory.createForClass(
+    AppUpdateConfigDocument,
 );

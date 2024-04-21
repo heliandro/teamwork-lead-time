@@ -1,19 +1,19 @@
-import { AppLastUpdate } from "src/domain/entities/app-last-update.entity";
-import { AppLastUpdateDocument } from "src/domain/schemas/app-lastupdate.schema";
-import { AppLastUpdateDocumentMapper } from "../mappers/app-last-update-document.mapper";
+import { AppUpdateConfig } from "src/domain/entities/app-update-config.entity";
+import { AppUpdateConfigDocument } from "src/domain/schemas/app-update-config.schema";
+import { AppUpdateConfigDocumentMapper } from "../mappers/app-update-config-document.mapper";
 
-export class GetAppLastUpdateResponseSuccessDTO {
+export class GetAppUpdateConfigOutputSuccessDTO {
 
     values: {
-        document: AppLastUpdate,
+        document: AppUpdateConfig,
         isBitbucketProjectsUpdated: boolean,
         isBitbucketCommitsUpdated: boolean,
         isBambooUpdated: boolean,
         isJiraUpdated: boolean,
     }
 
-    constructor(appLastUpdateDocument: AppLastUpdateDocument) {
-        const document = AppLastUpdateDocumentMapper.toAppLastUpdate(appLastUpdateDocument);
+    constructor(appUpdateConfigDocument: AppUpdateConfigDocument) {
+        const document = AppUpdateConfigDocumentMapper.toEntity(appUpdateConfigDocument);
         this.values = {
             document,
             isBitbucketProjectsUpdated: document.isBitbucketProjectsUpdated(),
