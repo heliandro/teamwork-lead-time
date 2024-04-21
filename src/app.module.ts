@@ -26,6 +26,8 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { CommitConsumerQueue } from './infrastructure/queue/bitbucket-commits-consumer.queue';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CommitSchema } from './domain/schemas/commit.schema';
+import { CommitRepository } from './infrastructure/repositories/commit.repository';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -54,9 +56,10 @@ export function loadConfig(): any {
         ScheduleModule.forRoot(),
         MongooseModule.forRoot(process.env.MONGODB_CONNECTION_STRING),
         MongooseModule.forFeature([
-            { name: 'projects', schema: ProjectSchema },
             { name: 'app_configurations', schema: AppUpdateConfigSchema },
-            { name: 'squads', schema: SquadSchema }
+            { name: 'squads', schema: SquadSchema },
+            { name: 'projects', schema: ProjectSchema },
+            { name: 'commits', schema: CommitSchema }
         ]),
         RabbitMQModule.forRoot(RabbitMQModule, {
             exchanges: [
@@ -138,6 +141,10 @@ export function loadConfig(): any {
             provide: 'DataLoaderBitbucketCommitsUseCase',
             useClass: DataLoaderBitbucketCommitsImplUseCase
         },
+        {
+            provide: 'CommitRepository',
+            useClass: CommitRepository
+        }
     ],
 })
 export class AppModule {}

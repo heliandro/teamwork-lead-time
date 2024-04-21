@@ -3,12 +3,15 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ConsumeMessage } from 'amqplib';
 import { BitbucketGateway } from "src/application/gateways/bitbucket.gateway";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
+import { CommitRepository } from "../repositories/commit.repository";
+import { BitbucketCommitsMapper } from "src/application/mappers/bitbucket-commits.mapper";
 
 @Injectable()
 export class CommitConsumerQueue {
     constructor(
         @Inject('ConsoleLogger') private readonly logger: ConsoleLoggerService,
         @Inject('BitbucketGateway') private readonly bitbucketGateway: BitbucketGateway,
+        @Inject('CommitRepository') private readonly commitRepository: CommitRepository,
     ) {
         this.logger.setContext(CommitConsumerQueue.name);
     }
@@ -29,13 +32,14 @@ export class CommitConsumerQueue {
         this.logger.log(`rabbitmq::processando mensagem: ${JSON.stringify(message)}`);
         
         try {
-            /*
-            * 1. Recuperar 1000 commits de um projeto por consumer e associar com o projectId + jiraKey + statusQueu = "Em Processamento" + dataDoCommit
-            * 2. Criar uma collection de commits e Salvar no mongodb
-            */
-            // const result: any = await this.bitbucketGateway.fetchCommits(message.projectId)
-            // console.log('commit message::',result.values[0].message);
-            // console.log(`Received message: ${JSON.stringify(amqpMessage)}`);
+            const result: any = await this.bitbucketGateway.fetchCommits(message.projectId);
+
+            if (result.size === 0) {
+                return new Nack(false); // rejeita a mensagem
+            }
+
+            const commits = BitbucketCommitsMapper.toEntities(result.values, message.projectId, 'Em Processamento');
+            await this.commitRepository.saveAll(commits);
         } catch (error) {
             this.logger.error(`error:: ${error}`);
             return new Nack(false); // rejeita a mensagem

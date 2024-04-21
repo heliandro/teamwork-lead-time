@@ -17,7 +17,8 @@ export class AppConfigurationRepository {
         let existingConfiguration = await this.getAppUpdateConfigById(appUpdateConfig.getDocumentId());
 
         if (existingConfiguration) {
-            existingConfiguration.set(appUpdateConfig)
+            // nao quero substituir e sim mesclar
+            existingConfiguration.set({ ...existingConfiguration, ...appUpdateConfig });
             return existingConfiguration.save();
         }
 

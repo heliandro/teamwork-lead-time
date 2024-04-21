@@ -11,6 +11,7 @@ export class AppUpdateConfigDocumentMapper {
         return new AppUpdateConfigBuilder()
             .withDocumentId(appUpdateConfigDocument.documentId)
             .withBitbucketProjectsLastUpdate(appUpdateConfigDocument?.bitbucketProjectsLastUpdate || null)
+            .withBitbucketCommitsLastUpdate(appUpdateConfigDocument?.bitbucketCommitsLastUpdate || null)
             .withBambooLastUpdate(appUpdateConfigDocument?.bambooLastUpdate || null)
             .withJiraLastUpdate(appUpdateConfigDocument?.jiraLastUpdate || null)
             .build();

@@ -76,8 +76,12 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
     private async updateAppConfiguration(document: AppUpdateConfig): Promise<void> {
         const setAppLastUpdateRequestDTO: ModifyAppUpdateConfigInputDTO = {
             documentId: document.getDocumentId(),
-            bitbucketProjectsLastUpdate: new Date()
+            bitbucketProjectsLastUpdate: new Date(),
+            bitbucketCommitsLastUpdate: document.getBitbucketCommitsLastUpdate(),
+            bambooLastUpdate: document.getBambooLastUpdate(),
+            jiraLastUpdate: document.getJiraLastUpdate(),
         }
+        
         await this.modifyAppUpdateConfigUseCase.execute(setAppLastUpdateRequestDTO);
     }
 
