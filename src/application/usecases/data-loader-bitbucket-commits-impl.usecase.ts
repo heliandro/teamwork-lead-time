@@ -1,16 +1,16 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { DataLoaderBitbucketCommitsUseCase } from "./interfaces/data-loader-bitbucket-commits.usecase";
-import { GetProjectsUseCase } from "./interfaces/get-projects.usecase";
+import { ListProjectsUseCase } from "./interfaces/list-projects.usecase";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
-import GetSquadsUseCase from "./interfaces/get-squads.usecase";
-import { GetSquadsOutputSuccessDTO } from "../dtos/get-squads-output-success.dto";
+import GetAllSquadsUseCase from "./interfaces/get-all-squads.usecase";
+import { GetAllSquadsOutputSuccessDTO } from "../dtos/get-all-squads-output-success.dto";
 import { GetAppUpdateConfigOutputSuccessDTO } from "../dtos/get-app-update-config-output-success.dto";
 import { GetAppUpdateConfigUseCase } from "./interfaces/get-app-update-config.usecase";
-import { SetAppUpdateConfigUseCase } from "./interfaces/set-app-update-config.usecase";
+import { ModifyAppUpdateConfigUseCase } from "./interfaces/modify-app-update-config.usecase";
 import { AppUpdateConfig } from "src/domain/entities/app-update-config.entity";
 import { Project } from "src/domain/entities/project.entity";
-import { SetAppUpdateConfigInputDTO } from "../dtos/set-app-update-config-input.dto";
-import { BitbucketGateway } from "src/infrastructure/gateways/bitbucket-impl.gateway";
+import { ModifyAppUpdateConfigInputDTO } from "../dtos/modify-app-update-config-input.dto";
+import { BitbucketGateway } from "src/application/gateways/bitbucket.gateway";
 
 @Injectable()
 export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucketCommitsUseCase {
@@ -20,14 +20,14 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         private readonly logger: ConsoleLoggerService,
         @Inject('BitbucketGateway')
         private readonly bitbucketGateway: BitbucketGateway,
-        @Inject('GetSquadsUseCase')
-        private readonly getSquadsUseCase: GetSquadsUseCase,
-        @Inject('GetProjectsUseCase')
-        private readonly getProjectsUseCase: GetProjectsUseCase,
-        @Inject('GetAppLastUpdateUseCase')
-        private readonly getAppLastUpdateUseCase: GetAppUpdateConfigUseCase,
-        @Inject('SetAppLastUpdateUseCase')
-        private readonly setAppLastUpdateUseCase: SetAppUpdateConfigUseCase,
+        @Inject('GetAllSquadsUseCase')
+        private readonly getAllSquadsUseCase: GetAllSquadsUseCase,
+        @Inject('ListProjectsUseCase')
+        private readonly listProjectsUseCase: ListProjectsUseCase,
+        @Inject('GetAppUpdateConfigUseCase')
+        private readonly getAppUpdateConfigUseCase: GetAppUpdateConfigUseCase,
+        @Inject('ModifyAppUpdateConfigUseCase')
+        private readonly modifyAppUpdateConfigUseCase: ModifyAppUpdateConfigUseCase,
     ) {
         this.logger.setContext(DataLoaderBitbucketCommitsImplUseCase.name);
     }
@@ -60,7 +60,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     }
 
     private async getAppConfiguration(): Promise<{ document: AppUpdateConfig, isBitbucketCommitsUpdated: boolean }> {
-        const appLastUpdateResponse: GetAppUpdateConfigOutputSuccessDTO = await this.getAppLastUpdateUseCase.execute();
+        const appLastUpdateResponse: GetAppUpdateConfigOutputSuccessDTO = await this.getAppUpdateConfigUseCase.execute();
         return appLastUpdateResponse.values;
     }
 
@@ -72,30 +72,30 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     }
 
     private async getProjectsIdsFromSquads(): Promise<string[]> {
-        const squads: GetSquadsOutputSuccessDTO = await this.getSquadsUseCase.execute();
+        const squads: GetAllSquadsOutputSuccessDTO = await this.getAllSquadsUseCase.execute();
         const projectIds = this._getProjectsIdsFromSquads(squads);
         return projectIds;
     }
 
     private async getProjectsFromDatabase(projectIds: string[]): Promise<Project[]> {
-        const projects = await this.getProjectsUseCase.execute({ projectIds });
+        const projects = await this.listProjectsUseCase.execute({ projectIds });
         return projects.values;
     }
 
     private async getBitbucketCommits(projectIds: string[]): Promise<any> {
-        const bitbucketCommits = await this.bitbucketGateway.getCommits(projectIds[0]);
+        const bitbucketCommits = await this.bitbucketGateway.fetchCommits(projectIds[0]);
         return bitbucketCommits;
     }
 
     private async updateAppConfiguration(document: AppUpdateConfig): Promise<void> {
-        const setAppLastUpdateRequestDTO: SetAppUpdateConfigInputDTO = {
+        const setAppLastUpdateRequestDTO: ModifyAppUpdateConfigInputDTO = {
             documentId: document.getDocumentId(),
             bitbucketCommitsLastUpdate: new Date()
         }
-        await this.setAppLastUpdateUseCase.execute(setAppLastUpdateRequestDTO);
+        await this.modifyAppUpdateConfigUseCase.execute(setAppLastUpdateRequestDTO);
     }
 
-    private _getProjectsIdsFromSquads(squads: GetSquadsOutputSuccessDTO): string[] {
+    private _getProjectsIdsFromSquads(squads: GetAllSquadsOutputSuccessDTO): string[] {
         return squads.values.reduce((acc, squad) => {
             return [...acc, ...squad.getLinkedProjects().map((project: any) => project.name)];
         }, []);

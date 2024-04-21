@@ -1,4 +1,4 @@
-export class SetAppUpdateConfigInputDTO {
+export class ModifyAppUpdateConfigInputDTO {
 
     documentId: string;
     bitbucketProjectsLastUpdate?: Date;

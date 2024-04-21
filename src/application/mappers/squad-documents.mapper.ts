@@ -2,7 +2,7 @@ import { Squad, SquadBuilder } from "src/domain/entities/squad.entity";
 import { SquadDocument } from "src/domain/schemas/squad.schema";
 
 export default class SquadDocumentsMapper {
-    static toEntity(squadDocuments: SquadDocument[]): Squad[] {
+    static toEntities(squadDocuments: SquadDocument[]): Squad[] {
 
         if (!squadDocuments.length) {
             return [];

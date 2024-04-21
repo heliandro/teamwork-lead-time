@@ -13,14 +13,14 @@ import { AppConfigurationRepository } from './infrastructure/repositories/app-co
 import { HttpModule } from '@nestjs/axios';
 import { BitbucketImplGateway } from './infrastructure/gateways/bitbucket-impl.gateway';
 import { SquadRepository } from './infrastructure/repositories/squad.repository';
-import GetSquadsImplUseCase from './application/usecases/get-squads-impl.usecase';
+import GetAllSquadsImplUseCase from './application/usecases/get-all-squads-impl.usecase';
 import { SquadSchema } from './domain/schemas/squad.schema';
 import { GetAppUpdateConfigImplUseCase } from './application/usecases/get-app-update-config-impl.usecase';
 import { DataLoaderBitbucketProjectsImplUseCase } from './application/usecases/data-loader-bitbucket-projects-impl.usecase';
-import { SetAppUpdateConfigImplUseCase } from './application/usecases/set-app-update-config-impl.usecase';
+import { ModifyAppUpdateConfigImplUseCase } from './application/usecases/modify-app-update-config-impl.usecase';
 import { ProjectRepository } from './infrastructure/repositories/project.repository';
-import { SetProjectsImplUseCase } from './application/usecases/set-projects-impl.usecase';
-import { GetProjectsImplUseCase } from './application/usecases/get-projects-impl.usecase';
+import { RegisterProjectsImplUseCase } from './application/usecases/register-projects-impl.usecase';
+import { ListProjectsImplUseCase } from './application/usecases/list-projects-impl.usecase';
 import { DataLoaderBitbucketCommitsImplUseCase } from './application/usecases/data-loader-bitbucket-commits-impl.usecase';
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { CommitConsumerQueue } from './infrastructure/queue/bitbucket-commits-consumer.queue';
@@ -84,12 +84,12 @@ export function loadConfig(): any {
             useClass: AppConfigurationRepository,
         },
         {
-            provide: 'GetAppLastUpdateUseCase',
+            provide: 'GetAppUpdateConfigUseCase',
             useClass: GetAppUpdateConfigImplUseCase,
         },
         {
-            provide: 'SetAppLastUpdateUseCase',
-            useClass: SetAppUpdateConfigImplUseCase,
+            provide: 'ModifyAppUpdateConfigUseCase',
+            useClass: ModifyAppUpdateConfigImplUseCase,
         },
         {
             provide: 'BitbucketGateway',
@@ -104,20 +104,20 @@ export function loadConfig(): any {
             useClass: SquadRepository
         },
         {
-            provide: 'GetSquadsUseCase',
-            useClass: GetSquadsImplUseCase
+            provide: 'GetAllSquadsUseCase',
+            useClass: GetAllSquadsImplUseCase
         },
         {
             provide: 'ProjectRepository',
             useClass: ProjectRepository
         },
         {
-            provide: 'SetProjectsUseCase',
-            useClass: SetProjectsImplUseCase
+            provide: 'RegisterProjectsUseCase',
+            useClass: RegisterProjectsImplUseCase
         },
         {
-            provide: 'GetProjectsUseCase',
-            useClass: GetProjectsImplUseCase
+            provide: 'ListProjectsUseCase',
+            useClass: ListProjectsImplUseCase
         },
         {
             provide: 'DataLoaderBitbucketCommitsUseCase',

@@ -1,11 +1,14 @@
 import { RabbitSubscribe, Nack, AmqpConnection } from "@golevelup/nestjs-rabbitmq";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ConsumeMessage } from 'amqplib';
+import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
 
 @Injectable()
 export class CommitConsumerQueue {
-    constructor(private readonly amqpConnection: AmqpConnection) {
-        console.log('CommitConsumerQueue');
+    constructor(
+        @Inject('ConsoleLogger') private readonly logger: ConsoleLoggerService,
+    ) {
+        this.logger.setContext(CommitConsumerQueue.name);
     }
 
     @RabbitSubscribe({
@@ -20,8 +23,8 @@ export class CommitConsumerQueue {
             },
         }
     })
-    public async pubSubHandler(message: any, amqpMessage: ConsumeMessage){
-        console.log(`Received subscribe 222: ${JSON.stringify(message)}`);
+    public async pubSubHandler(message: any, amqpMessage: ConsumeMessage) {
+        this.logger.log(`received message: ${JSON.stringify(message)}`);
         // console.log(`Received message: ${JSON.stringify(amqpMessage)}`);
         // return new Nack(false); // enviar para dead letter
     }
@@ -32,6 +35,7 @@ export class CommitConsumerQueue {
         queue: 'dead_letter_dataloader_bitbucket_commits_queue',
     })
     public async handleDeadLetterMessages(message: any, amqpMessage: ConsumeMessage) {
-        console.log(`Received dead letter message: ${JSON.stringify(message)}`);
+        this.logger.error(`received message: ${JSON.stringify(message)}`);
+        // console.log(`Received message: ${JSON.stringify(amqpMessage)}`);
     }
 }

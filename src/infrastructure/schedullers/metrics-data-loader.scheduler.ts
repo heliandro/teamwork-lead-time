@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConsoleLoggerService } from 'src/utils/services/console-logger.service';
 import { DataLoaderBitbucketProjectsUseCase } from 'src/application/usecases/interfaces/data-loader-bitbucket-projects.usecase';
-import { GetProjectsUseCase } from 'src/application/usecases/interfaces/get-projects.usecase';
+import { ListProjectsUseCase } from 'src/application/usecases/interfaces/list-projects.usecase';
 import { DataLoaderBitbucketCommitsUseCase } from 'src/application/usecases/interfaces/data-loader-bitbucket-commits.usecase';
 
 @Injectable()
