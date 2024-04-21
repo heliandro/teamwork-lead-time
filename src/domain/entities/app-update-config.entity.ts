@@ -6,7 +6,7 @@ export class AppUpdateConfig {
     private bambooLastUpdate: Date;
     private jiraLastUpdate: Date;
 
-    private static bitbucketTimeToCheckInMinutes: number = 30;
+    private static bitbucketTimeToCheckInMinutes: number = 120;
     private static bambooTimeToCheckInMinutes: number = 30;
     private static jiraTimeToCheckInMinutes: number = 30;
 

@@ -86,6 +86,19 @@ Authorization: Bearer {{AccessTokenBitbucket}}
 
 
 
+### BUSCAR ISSUE NO JIRA - essa é do tipo História -> fields.issuetype.name = "História" | fields.issuetype.id = 10001 | fields.issuetype.subtask = false
+GET {{companyJiraURI}}/rest/api/latest/issue/BGSAT-24045
+Authorization: Bearer {{AccessTokenJira}}
+
+### BUSCAR ISSUE NO JIRA - SUBTASK da de cima -> key = BGSAT-25678 | fields.parent.key === BGSAT-24045 |   fields.issuetype.name = "Sub-Imp" | fields.issuetype.id = 10227 | fields.issuetype.subtask = true
+GET {{companyJiraURI}}/rest/api/latest/issue/BGSAT-25678
+Authorization: Bearer {{AccessTokenJira}}
+
+
+
+
+
+
 
 ### LISTAR COMMITS DO REPOSITORIO
 # @name reqListarCommitsRepositorio

@@ -11,6 +11,7 @@ import { AppUpdateConfig } from "src/domain/entities/app-update-config.entity";
 import { Project } from "src/domain/entities/project.entity";
 import { ModifyAppUpdateConfigInputDTO } from "../dtos/modify-app-update-config-input.dto";
 import { BitbucketGateway } from "src/application/gateways/bitbucket.gateway";
+import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
 
 @Injectable()
 export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucketCommitsUseCase {
@@ -28,6 +29,8 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         private readonly getAppUpdateConfigUseCase: GetAppUpdateConfigUseCase,
         @Inject('ModifyAppUpdateConfigUseCase')
         private readonly modifyAppUpdateConfigUseCase: ModifyAppUpdateConfigUseCase,
+        // enviar mensagem para a fila
+        private amqpConnection: AmqpConnection,
     ) {
         this.logger.setContext(DataLoaderBitbucketCommitsImplUseCase.name);
     }
@@ -37,8 +40,9 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
             this.logger.log('iniciando carga dos commits do bitbucket...');
             const { isBitbucketCommitsUpdated, document } = await this.getAppConfiguration();
             this.validateIfBitbucketCommitsIsUpdated(isBitbucketCommitsUpdated);
-            const projectIds = await this.getProjectsIdsFromSquads();
-            const projects = await this.getProjectsFromDatabase(projectIds);
+            const squadProjectIds = await this._getProjectsIdsFromSquads();
+            const projects = await this._filterProjectsIdsFromProjectsDatabase(squadProjectIds);
+            await this._sendToBitbucketCommitsQueue(squadProjectIds);
             // TODO - Implementar fila de processamento para recuperar os commits de todos os projetos
                 /* TODO - USAR RABBITMQ
                 * 1. Criar uma fila de processamento para recuperar os commits dos projetos
@@ -71,15 +75,31 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         }
     }
 
-    private async getProjectsIdsFromSquads(): Promise<string[]> {
+    private async _getProjectsIdsFromSquads(): Promise<string[]> {
         const squads: GetAllSquadsOutputSuccessDTO = await this.getAllSquadsUseCase.execute();
-        const projectIds = this._getProjectsIdsFromSquads(squads);
+        const projectIds = this._filterProjectsIdsFromSquads(squads);
         return projectIds;
     }
 
-    private async getProjectsFromDatabase(projectIds: string[]): Promise<Project[]> {
+    private async _filterProjectsIdsFromProjectsDatabase(projectIds: string[]): Promise<Project[]> {
         const projects = await this.listProjectsUseCase.execute({ projectIds });
         return projects.values;
+    }
+
+    private async _sendToBitbucketCommitsQueue(projectIds: string[]): Promise<void> {
+        // while (projectIds.length > 0) {
+        //     const projectId = projectIds.shift();
+        //     const message = {
+        //         projectId
+        //     }
+        //     await this.amqpConnection.publish('bitbucket_commits_exchange', 'bitbucket.commits.get.*', message);
+        // }
+
+            const projectId = projectIds[0];
+            const message = {
+                projectId
+            }
+            await this.amqpConnection.publish('bitbucket_commits_exchange', 'bitbucket.commits.get.*', message);
     }
 
     private async getBitbucketCommits(projectIds: string[]): Promise<any> {
@@ -95,7 +115,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         await this.modifyAppUpdateConfigUseCase.execute(setAppLastUpdateRequestDTO);
     }
 
-    private _getProjectsIdsFromSquads(squads: GetAllSquadsOutputSuccessDTO): string[] {
+    private _filterProjectsIdsFromSquads(squads: GetAllSquadsOutputSuccessDTO): string[] {
         return squads.values.reduce((acc, squad) => {
             return [...acc, ...squad.getLinkedProjects().map((project: any) => project.name)];
         }, []);

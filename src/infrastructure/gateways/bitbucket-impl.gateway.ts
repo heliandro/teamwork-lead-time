@@ -1,9 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UseInterceptors } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { ConsoleLoggerService } from 'src/utils/services/console-logger.service';
 import { BitbucketGateway } from 'src/application/gateways/bitbucket.gateway';
+import { CACHE_MANAGER, Cache, CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 interface BitbucketRequestOptions {
     headers: { Authorization: string };
@@ -27,11 +28,13 @@ export class BitbucketImplGateway implements BitbucketGateway {
     private bitbucketApiToken: string;
     private projectsRequest: BitbucketRequest
     private commitsRequest: BitbucketRequest
+    private cacheTTL: number = 3600;
 
     constructor(
-        private httpService: HttpService,
+        private readonly httpService: HttpService,
         private readonly configService: ConfigService,
         @Inject('ConsoleLogger') private readonly logger: ConsoleLoggerService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
     ) {
         this.logger.setContext(BitbucketImplGateway.name);
         this.initEnv();
@@ -131,16 +134,41 @@ export class BitbucketImplGateway implements BitbucketGateway {
     async fetchCommits(projectId: string, limit?: number): Promise<any> {
         this.logger.log('recuperando commits do bitbucket...');
 
+        // const cacheKey = `bitbucket_commits_${projectId}`;
+        // const isCacheOutdated = await this._isCacheOutdated(cacheKey);
+        // if (!isCacheOutdated) {
+        //     const cachedCommits = await this._getFromCache(cacheKey);
+        //     this.logger.log('commits do bitbucket recuperados do cache com sucesso!');
+        //     return cachedCommits;
+        // }
+
         let commitsUrl = this.commitsRequest.url.replace('__PROJECTID__', projectId);
         let queryLimit = limit ? limit : this.commitsRequest.options.queryParams.limit;
-        const queryParameters = `?limit=${queryLimit}`;
+        const queryParameters = `?start=0&limit=${queryLimit}`;
+
+        console.log(`${commitsUrl}${queryParameters}`);
 
         const response = await this.httpService.axiosRef.get(
             `${commitsUrl}${queryParameters}`,
             { headers: this.commitsRequest.options.headers }
         );
+        // this.cacheManager.set(cacheKey, response.data, this.cacheTTL);
 
         this.logger.log('commits do bitbucket recuperados com sucesso!');
         return response.data;
+    }
+
+    private async _isCacheOutdated(cacheKey: string): Promise<boolean> {
+        const cachedData: any[] = await this._getFromCache(cacheKey);
+        console.log(`cachedData: ${cachedData}`)
+        if (cachedData && cachedData.length > 0) {
+            return false;
+        }
+        return true;
+    }
+
+    private async _getFromCache(cacheKey: string): Promise<any[]> {
+        const cachedData: any[] = await this.cacheManager.get(cacheKey);
+        return cachedData;
     }
 }

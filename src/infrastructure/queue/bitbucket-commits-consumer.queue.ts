@@ -1,12 +1,14 @@
 import { RabbitSubscribe, Nack, AmqpConnection } from "@golevelup/nestjs-rabbitmq";
 import { Inject, Injectable } from "@nestjs/common";
 import { ConsumeMessage } from 'amqplib';
+import { BitbucketGateway } from "src/application/gateways/bitbucket.gateway";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
 
 @Injectable()
 export class CommitConsumerQueue {
     constructor(
         @Inject('ConsoleLogger') private readonly logger: ConsoleLoggerService,
+        @Inject('BitbucketGateway') private readonly bitbucketGateway: BitbucketGateway,
     ) {
         this.logger.setContext(CommitConsumerQueue.name);
     }
@@ -24,7 +26,9 @@ export class CommitConsumerQueue {
         }
     })
     public async pubSubHandler(message: any, amqpMessage: ConsumeMessage) {
-        this.logger.log(`received message: ${JSON.stringify(message)}`);
+        this.logger.log(`rabbitmq::processando mensagem: ${JSON.stringify(message)}`);
+        const result: any = await this.bitbucketGateway.fetchCommits(message.projectId)
+        console.log('commit message::',result.values[0].message);
         // console.log(`Received message: ${JSON.stringify(amqpMessage)}`);
         // return new Nack(false); // enviar para dead letter
     }

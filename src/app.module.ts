@@ -24,6 +24,8 @@ import { ListProjectsImplUseCase } from './application/usecases/list-projects-im
 import { DataLoaderBitbucketCommitsImplUseCase } from './application/usecases/data-loader-bitbucket-commits-impl.usecase';
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { CommitConsumerQueue } from './infrastructure/queue/bitbucket-commits-consumer.queue';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -73,9 +75,18 @@ export function loadConfig(): any {
         }),
         UtilsModule,
         HttpModule,
+        CacheModule.register({
+            ttl: 3600,
+            max: 2000,
+            isGlobal: true,
+        }),
     ],
     controllers: [AppController],
     providers: [
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: CacheInterceptor,
+        },
         MetricsDataLoaderScheduler,
         CommitConsumerQueue,
         { provide: 'HealthUseCase', useClass: HealthImplUseCase },
