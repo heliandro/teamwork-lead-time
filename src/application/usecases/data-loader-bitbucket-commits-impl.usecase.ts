@@ -43,21 +43,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
             const squadProjectIds = await this._getProjectsIdsFromSquads();
             const projects = await this._filterProjectsIdsFromProjectsDatabase(squadProjectIds);
             await this._sendToBitbucketCommitsQueue(squadProjectIds);
-            // TODO - Implementar fila de processamento para recuperar os commits de todos os projetos
-                /* TODO - USAR RABBITMQ
-                * 1. Criar uma fila de processamento para recuperar os commits dos projetos
-                * 2. Recuperar 10e00 commits de um projeto por consumer e associar com o projectId + jiraKey + statusQueu = "Em Processamento"
-                * 3. Criar uma collection de commits e Salvar no mongodb
-                * 
-                * 4. Criar outra fila de processamento para recuperar as informações da branch de cada commit
-                * 5. Recuperar as informacoes do commit
-                * 6. Buscar no bitbucket as informações da branch associada ao commit
-                * 7. Associar as informações da branch com o commit + statusQue = "Finalizado"
-                * 8. Atualizar a collection de commits do mongodb
-                */
-
-            // TODO - LEAD TIME - agrupar commits por jiraKey, pegar o primeiro commit e o último commit associado ao jiraKey e calcular o lead time
-            
+            this.logger.log('processando carga dos commits do bitbucket via fila!');
         } catch (error) {
             this.logger.error(`${error.message}`);
         }
@@ -87,6 +73,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     }
 
     private async _sendToBitbucketCommitsQueue(projectIds: string[]): Promise<void> {
+        // TODO - DESCOMENTAR CODIGO ABAIXO
         // while (projectIds.length > 0) {
         //     const projectId = projectIds.shift();
         //     const message = {
@@ -94,12 +81,12 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         //     }
         //     await this.amqpConnection.publish('bitbucket_commits_exchange', 'bitbucket.commits.get.*', message);
         // }
-
-            const projectId = projectIds[0];
-            const message = {
-                projectId
-            }
-            await this.amqpConnection.publish('bitbucket_commits_exchange', 'bitbucket.commits.get.*', message);
+        // TODO - REMOVER CODIGO ABAIXO
+        const projectId = projectIds[0];
+        const message = {
+            projectId
+        }
+        await this.amqpConnection.publish('bitbucket_commits_exchange', 'bitbucket.commits.get.*', message);
     }
 
     private async getBitbucketCommits(projectIds: string[]): Promise<any> {

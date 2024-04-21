@@ -15,31 +15,65 @@ export class CommitConsumerQueue {
 
     @RabbitSubscribe({
         exchange: 'bitbucket_commits_exchange',
-        routingKey: 'bitbucket.commits.get.*',
+        routingKey: 'project.*.commits',
         queue: 'dataloader_bitbucket_commits_queue',
         queueOptions: {
             durable: true,
             arguments: {
                 'x-dead-letter-exchange': 'dead_letter_bitbucket_commits_exchange',
-                'x-dead-letter-routing-key': 'bitbucket.commits.get.*',
+                'x-dead-letter-routing-key': 'project.*.commits',
             },
         }
     })
-    public async pubSubHandler(message: any, amqpMessage: ConsumeMessage) {
+    public async commitsSubscribeHandler(message: any, amqpMessage: ConsumeMessage) {
         this.logger.log(`rabbitmq::processando mensagem: ${JSON.stringify(message)}`);
-        const result: any = await this.bitbucketGateway.fetchCommits(message.projectId)
-        console.log('commit message::',result.values[0].message);
-        // console.log(`Received message: ${JSON.stringify(amqpMessage)}`);
-        // return new Nack(false); // enviar para dead letter
+        
+        try {
+            /*
+            * 1. Recuperar 1000 commits de um projeto por consumer e associar com o projectId + jiraKey + statusQueu = "Em Processamento" + dataDoCommit
+            * 2. Criar uma collection de commits e Salvar no mongodb
+            */
+            // const result: any = await this.bitbucketGateway.fetchCommits(message.projectId)
+            // console.log('commit message::',result.values[0].message);
+            // console.log(`Received message: ${JSON.stringify(amqpMessage)}`);
+        } catch (error) {
+            this.logger.error(`error:: ${error}`);
+            return new Nack(false); // rejeita a mensagem
+        }
     }
 
     @RabbitSubscribe({
         exchange: 'dead_letter_bitbucket_commits_exchange',
-        routingKey: 'bitbucket.commits.get.*',
+        routingKey: 'project.*.commits',
         queue: 'dead_letter_dataloader_bitbucket_commits_queue',
     })
     public async handleDeadLetterMessages(message: any, amqpMessage: ConsumeMessage) {
-        this.logger.error(`received message: ${JSON.stringify(message)}`);
+        this.logger.error(`rabbitmq::dead-letter::received message: ${JSON.stringify(message)}`);
         // console.log(`Received message: ${JSON.stringify(amqpMessage)}`);
+    }
+
+    @RabbitSubscribe({
+        exchange: 'bitbucket_commit_extrainfo_exchange',
+        routingKey: 'commit.*.extrainfo',
+        queue: 'dataloader_bitbucket_commits_extrainfo_queue',
+        queueOptions: {
+            durable: true
+        }
+    })
+    public async commitExtraInfoSubscribeHandler(message: any, amqpMessage: ConsumeMessage) {
+        this.logger.log(`rabbitmq::commit-extrainfo::processando mensagem: ${JSON.stringify(message)}`);
+        try {
+            /* 
+            * 5. Recuperar as informacoes do commit do mongodb
+            * 6. Buscar no bitbucket as informações da branch associada ao commit
+            * 7. Buscar no jira as informações do jiraKey do tipo historia associado ao commit
+            * 8. Associar as informações da branch com o commit + statusQue = "Finalizado"
+            * 9. Atualizar a collection de commits do mongodb
+            */
+
+        } catch (error) {
+            this.logger.error(`error:: ${error}`);
+            return new Nack(false);
+        }
     }
 }

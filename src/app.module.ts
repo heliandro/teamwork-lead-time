@@ -67,6 +67,10 @@ export function loadConfig(): any {
                 {
                     name: 'dead_letter_bitbucket_commits_exchange',
                     type: 'topic',
+                },
+                {
+                    name: 'bitbucket_commit_extrainfo_exchange',
+                    type: 'topic',
                 }
             ],
             uri: process.env.RABBITMQ_CONNECTION_STRING,
