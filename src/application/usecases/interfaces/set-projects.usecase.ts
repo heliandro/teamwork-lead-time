@@ -1,5 +1,5 @@
-import { SetProjectsRequestDTO } from "src/application/dtos/set-projects-request.dto";
+import { SetProjectsInputDTO } from "src/application/dtos/set-projects-input.dto";
 
 export interface SetProjectsUseCase {
-    execute(input: SetProjectsRequestDTO): Promise<void>;
+    execute(input: SetProjectsInputDTO): Promise<void>;
 }

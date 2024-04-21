@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { GetSquadsResponseSuccessDTO } from "../dtos/get-squads-response-success.dto";
+import { GetSquadsOutputSuccessDTO } from "../dtos/get-squads-output-success.dto";
 import GetSquadsUseCase from "./interfaces/get-squads.usecase";
 import { SquadRepository } from "src/infrastructure/repositories/squad.repository";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
@@ -15,11 +15,11 @@ export default class GetSquadsImplUseCase implements GetSquadsUseCase {
         this.logger.setContext(GetSquadsImplUseCase.name);
     }
 
-    async execute(): Promise<GetSquadsResponseSuccessDTO> {
+    async execute(): Promise<GetSquadsOutputSuccessDTO> {
         this.logger.log('iniciando busca de squads no database...');
         
         const squadsDocuments = await this.squadRepository.getAll();
-        const response = new GetSquadsResponseSuccessDTO(squadsDocuments);
+        const response = new GetSquadsOutputSuccessDTO(squadsDocuments);
 
         if (!response.size) {
             this.logger.warn('não foram encontradas squads no database');

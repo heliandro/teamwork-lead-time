@@ -1,5 +1,5 @@
-import { GetSquadsResponseSuccessDTO } from 'src/application/dtos/get-squads-response-success.dto';
+import { GetSquadsOutputSuccessDTO } from 'src/application/dtos/get-squads-output-success.dto';
 
 export default interface GetSquadsUseCase {
-    execute(): Promise<GetSquadsResponseSuccessDTO>;
+    execute(): Promise<GetSquadsOutputSuccessDTO>;
 }

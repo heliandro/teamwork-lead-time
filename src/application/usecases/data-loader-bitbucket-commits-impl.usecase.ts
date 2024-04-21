@@ -3,7 +3,7 @@ import { DataLoaderBitbucketCommitsUseCase } from "./interfaces/data-loader-bitb
 import { GetProjectsUseCase } from "./interfaces/get-projects.usecase";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
 import GetSquadsUseCase from "./interfaces/get-squads.usecase";
-import { GetSquadsResponseSuccessDTO } from "../dtos/get-squads-response-success.dto";
+import { GetSquadsOutputSuccessDTO } from "../dtos/get-squads-output-success.dto";
 import { GetAppUpdateConfigOutputSuccessDTO } from "../dtos/get-app-update-config-output-success.dto";
 import { GetAppUpdateConfigUseCase } from "./interfaces/get-app-update-config.usecase";
 import { SetAppUpdateConfigUseCase } from "./interfaces/set-app-update-config.usecase";
@@ -72,7 +72,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     }
 
     private async getProjectsIdsFromSquads(): Promise<string[]> {
-        const squads: GetSquadsResponseSuccessDTO = await this.getSquadsUseCase.execute();
+        const squads: GetSquadsOutputSuccessDTO = await this.getSquadsUseCase.execute();
         const projectIds = this._getProjectsIdsFromSquads(squads);
         return projectIds;
     }
@@ -95,7 +95,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         await this.setAppLastUpdateUseCase.execute(setAppLastUpdateRequestDTO);
     }
 
-    private _getProjectsIdsFromSquads(squads: GetSquadsResponseSuccessDTO): string[] {
+    private _getProjectsIdsFromSquads(squads: GetSquadsOutputSuccessDTO): string[] {
         return squads.values.reduce((acc, squad) => {
             return [...acc, ...squad.getLinkedProjects().map((project: any) => project.name)];
         }, []);

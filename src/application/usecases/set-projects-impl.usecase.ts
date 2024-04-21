@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { SetProjectsUseCase } from "./interfaces/set-projects.usecase";
-import { SetProjectsRequestDTO } from "../dtos/set-projects-request.dto";
+import { SetProjectsInputDTO } from "../dtos/set-projects-input.dto";
 import { Project } from "src/domain/entities/project.entity";
 import { ProjectRepository } from "src/infrastructure/repositories/project.repository";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
@@ -19,13 +19,17 @@ export class SetProjectsImplUseCase implements SetProjectsUseCase {
         this.logger.setContext(SetProjectsImplUseCase.name);
     }
 
-    async execute(input: SetProjectsRequestDTO): Promise<void> {
+    async execute(input: SetProjectsInputDTO): Promise<void> {
         this.logger.log('deletando todos os projetos do database...');
         await this.projectRepository.deleteAll();
 
         this.logger.log('salvando os projetos atualizados no database...');
-        const projects: Project[] = BitbucketProjectsMapper.toProjects(input.projects);
-        await this.projectRepository.saveAll(projects);
+        const projects: Project[] = BitbucketProjectsMapper.toEntity(input.projects);
+        const result = await this.projectRepository.saveAll(projects);
+
+        if (!result) {
+            throw new Error('falha ao salvar os projetos no database');
+        }
         
         this.logger.log('projetos salvos com sucesso!');
     }

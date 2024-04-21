@@ -1,6 +1,6 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import HealthUseCase from '../../application/usecases/interfaces/health.usecase';
-import HealthResponseDTO from '../../application/dtos/health-response.dto';
+import HealthOutputDTO from '../../application/dtos/health-output.dto';
 
 @Controller()
 export class AppController {
@@ -9,7 +9,7 @@ export class AppController {
     ) {}
 
     @Get('/health')
-    getHealth(): HealthResponseDTO {
+    getHealth(): HealthOutputDTO {
         return this.healthUsecase.execute();
     }
 }

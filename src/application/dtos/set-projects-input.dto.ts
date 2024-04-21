@@ -1,6 +1,6 @@
 import { Project } from "src/domain/entities/project.entity";
 
-export class SetProjectsRequestDTO {
+export class SetProjectsInputDTO {
     projects: any[];
     
     constructor(projects: any[]) {

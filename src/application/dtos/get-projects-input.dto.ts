@@ -1,4 +1,4 @@
-export class GetProjectsRequestDTO {
+export class GetProjectsInputDTO {
 
     projectIds?: string[];
 

@@ -28,10 +28,11 @@ export class SetAppUpdateConfigImplUseCase implements SetAppUpdateConfigUseCase 
             .build();
 
         const result = await this.appConfigurationRepository.save(appLastUpdate);
+
         if (!result) {
-            this.logger.error('ocorreu um erro ao tentar salvar as datas de última atualização dos serviços no database!');
             throw new Error('ocorreu um erro ao tentar salvar as datas de última atualização dos serviços no database!');
         }
+        
         this.logger.log('o documento de configuração da aplicação foi atualizado com sucesso!');
     }
 }

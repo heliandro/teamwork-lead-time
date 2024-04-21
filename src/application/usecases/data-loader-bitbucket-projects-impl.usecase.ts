@@ -7,7 +7,7 @@ import { GetAppUpdateConfigUseCase } from './interfaces/get-app-update-config.us
 import { SetAppUpdateConfigUseCase } from './interfaces/set-app-update-config.usecase';
 import { SetAppUpdateConfigInputDTO } from '../dtos/set-app-update-config-input.dto';
 import { SetProjectsUseCase } from './interfaces/set-projects.usecase';
-import { GetSquadsResponseSuccessDTO } from '../dtos/get-squads-response-success.dto';
+import { GetSquadsOutputSuccessDTO } from '../dtos/get-squads-output-success.dto';
 import GetSquadsUseCase from './interfaces/get-squads.usecase';
 import { AppUpdateConfig } from 'src/domain/entities/app-update-config.entity';
 
@@ -59,7 +59,7 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
     }
 
     private async getProjectsIdsFromSquads(): Promise<string[]> {
-        const squads: GetSquadsResponseSuccessDTO = await this.getSquadsUseCase.execute();
+        const squads: GetSquadsOutputSuccessDTO = await this.getSquadsUseCase.execute();
         const projectIds = this._getProjectsIdsFromSquads(squads);
         return projectIds;
     }
@@ -81,7 +81,7 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
         await this.setAppLastUpdateUseCase.execute(setAppLastUpdateRequestDTO);
     }
 
-    private _getProjectsIdsFromSquads(squads: GetSquadsResponseSuccessDTO): string[] {
+    private _getProjectsIdsFromSquads(squads: GetSquadsOutputSuccessDTO): string[] {
         return squads.values.reduce((acc, squad) => {
             return [...acc, ...squad.getLinkedProjects().map((project: any) => project.name)];
         }, []);

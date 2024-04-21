@@ -1,7 +1,7 @@
 import { ProjectBuilder } from "src/domain/entities/project.entity";
 
 export default class ProjectDocumentsMapper {
-    static toProjects(projectDocuments) {
+    static toEntity(projectDocuments) {
 
         if (!projectDocuments.length) {
             return [];

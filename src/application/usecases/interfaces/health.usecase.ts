@@ -1,5 +1,5 @@
-import HealthResponseDTO from 'src/application/dtos/health-response.dto';
+import HealthOutputDTO from 'src/application/dtos/health-output.dto';
 
 export default interface HealthUseCase {
-    execute(): HealthResponseDTO;
+    execute(): HealthOutputDTO;
 }
