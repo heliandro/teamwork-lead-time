@@ -7,6 +7,12 @@ import { DataLoaderBitbucketCommitsUseCase } from 'src/application/usecases/inte
 @Injectable()
 export class MetricsDataLoaderScheduler {
 
+    private static MONDAY_TO_FRIDAY_AT_9AM = "0 0 09 * * 1-5";
+    private static MONDAY_TO_FRIDAY_AT_09_30AM = "0 30 09 * * 1-5";
+    private static MONDAY_TO_FRIDAY_AT_09_15AM = '0 15 09 * * 1-5';
+    private static EVERY_5_MINUTES = "0 */5 * * * *" // a cada 5 minutos
+    private static MONDAY_TO_FRIDAY_EVERY_5_MINUTES: string = '0 */5 * * * 1-7';
+
     constructor(
         @Inject('ConsoleLogger')
         private readonly logger: ConsoleLoggerService,
@@ -16,30 +22,57 @@ export class MetricsDataLoaderScheduler {
         private readonly dataLoaderBitbucketCommitsUseCase: DataLoaderBitbucketCommitsUseCase,
     ) {
         this.logger.setContext(MetricsDataLoaderScheduler.name);
-        this.init();
+        this.loarderMainInfo();
+        // setTimeout(() => {
+        //     this.loaderExtraInfo();
+        // }, 1000 * 60 * 5); // 5 minutos
     }
 
     @Cron(CronExpression.EVERY_DAY_AT_9AM)
-    private handleCron() {
-        this.init();
+    private handleMainCron() {
+        this.loarderMainInfo();
     }
 
-    private async init() {
+    // every day of week at 9:15 AM
+    @Cron(MetricsDataLoaderScheduler.MONDAY_TO_FRIDAY_EVERY_5_MINUTES)
+    private handleExtraCron() {
+        this.loaderExtraInfo();
+    }
+
+    private async loarderMainInfo() {
         try {
-            this.runDataLoader();
+            this.runMainDataLoader();
         } catch (error) {
-            this.logger.error(`${error.message} - carga de dados cancelada!`);
+            this.logger.error(`${error.message} - carga de dados de métricas principal cancelada!`);
         }
     }
 
-    private async runDataLoader() {
+    private async runMainDataLoader() {
         try {
-            this.logger.log('scheduler de carga dos dados de métricas iniciada!');
+            this.logger.log('scheduler de carga dos dados de métricas principal iniciada!');
             await this.dataLoaderBitbucketProjectsUseCase.execute();
             await this.dataLoaderBitbucketCommitsUseCase.execute();
-            this.logger.log('scheduler de carga dos dados de métricas finalizada!');
+            this.logger.log('scheduler de carga dos dados de métricas principal finalizada!');
         } catch (error) {
-            this.logger.error(`scheduler de carga dos dados de métricas finalizada com erro: ${error.message}`);
+            this.logger.error(`scheduler de carga dos dados de métricas principal finalizada com erro: ${error.message}`);
+        }
+    }
+
+    private async loaderExtraInfo() {
+        try {
+            this.runExtraDataLoader();
+        } catch (error) {
+            this.logger.error(`${error.message} - carga de dados de métricas para informações adicionais cancelada!`);
+        }
+    }
+
+    private async runExtraDataLoader() {
+        try {
+            this.logger.log('scheduler de carga de dados de métricas para informações adicionais iniciada!');
+            // TODO - implementar usecase para a carga de dados de métricas para informações adicionais
+            this.logger.log('scheduler de carga de dados de métricas para informações adicionais finalizada!');
+        } catch (error) {
+            this.logger.error(`scheduler de carga de dados de métricas para informações adicionais finalizada com erro: ${error.message}`);
         }
     }
 }

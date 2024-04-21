@@ -34,7 +34,7 @@ export class CommitConsumerQueue {
         try {
             const result: any = await this.bitbucketGateway.fetchCommits(message.projectId);
 
-            if (result.size === 0) {
+            if (!result?.size || !result?.values?.length) {
                 return new Nack(false); // rejeita a mensagem
             }
 
