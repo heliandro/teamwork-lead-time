@@ -8,7 +8,7 @@ db.getSiblingDB('admin').auth(
 db.createUser({
   user: "heliandro",
   pwd: "pass123",
-  roles: [{ role: "readWrite", db: "teamwork_leadtime" }]
+  roles: [{ role: "readWrite", db: "company_metrics" }]
 })
 
 db.createCollection("squads")
@@ -16,7 +16,7 @@ db.createCollection("squads")
 db.squads.insertMany([
     { 
         documentId: "grecia",
-        squad: "Grécia",
+        name: "Grécia",
         members: [],
         linkedProjects: [
             { name: "sigla_projeto-bff-nome_projeto" },
@@ -26,84 +26,84 @@ db.squads.insertMany([
     },
     {
         documentId: "alemanha",
-        squad: "Alemanha",
+        name: "Alemanha",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "egito",
-        squad: "Egito",
+        name: "Egito",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "luxemburgo",
-        squad: "Luxemburgo",
+        name: "Luxemburgo",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "panama",
-        squad: "Panama",
+        name: "Panama",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "madagascar",
-        squad: "Madagascar",
+        name: "Madagascar",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "japao",
-        squad: "Japão",
+        name: "Japão",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "canada",
-        squad: "Canadá",
+        name: "Canadá",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "dinamarca",
-        squad: "Dinamarca",
+        name: "Dinamarca",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "brasil",
-        squad: "Brasil",
+        name: "Brasil",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "suica",
-        squad: "Suíça",
+        name: "Suíça",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "china",
-        squad: "China",
+        name: "China",
         members: [],
         linkedProjects: [
         ]
     },
     {
         documentId: "filipinas",
-        squad: "Filipinas",
+        name: "Filipinas",
         members: [],
         linkedProjects: [
         ]

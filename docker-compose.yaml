@@ -3,16 +3,29 @@ version: '3.8'
 services:
   mongodb:
     image: mongo
-    container_name: mongodb-leadtime
+    container_name: mongodb-company-metrics
     ports:
       - "27018:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: "admin"
       MONGO_INITDB_ROOT_PASSWORD: "admin123"
-      MONGO_INITDB_DATABASE: "teamwork_leadtime"
+      MONGO_INITDB_DATABASE: "company_metrics"
     volumes:
-      - mongodb_leadtime:/data/db
+      - mongodb_volume:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-company-metrics
+    ports:
+      - "5672:5672"  # AMQP
+      - "15672:15672"  # painel de controle
+    volumes:
+      - rabbitmq_volume:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "admin123"
     
 volumes:
-  mongodb_leadtime:
+  mongodb_volume:
+  rabbitmq_volume:

@@ -42,7 +42,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
             // TODO - Implementar fila de processamento para recuperar os commits de todos os projetos
                 /* TODO - USAR RABBITMQ
                 * 1. Criar uma fila de processamento para recuperar os commits dos projetos
-                * 2. Recuperar 1000 commits de um projeto por consumer e associar com o projectId + jiraKey + statusQueu = "Em Processamento"
+                * 2. Recuperar 10e00 commits de um projeto por consumer e associar com o projectId + jiraKey + statusQueu = "Em Processamento"
                 * 3. Criar uma collection de commits e Salvar no mongodb
                 * 
                 * 4. Criar outra fila de processamento para recuperar as informações da branch de cada commit

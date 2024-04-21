@@ -22,6 +22,8 @@ import { ProjectRepository } from './infrastructure/repositories/project.reposit
 import { SetProjectsImplUseCase } from './application/usecases/set-projects-impl.usecase';
 import { GetProjectsImplUseCase } from './application/usecases/get-projects-impl.usecase';
 import { DataLoaderBitbucketCommitsImplUseCase } from './application/usecases/data-loader-bitbucket-commits-impl.usecase';
+import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import { CommitConsumerQueue } from './infrastructure/queue/bitbucket-commits-consumer.queue';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -48,19 +50,35 @@ export function loadConfig(): any {
     imports: [
         ConfigModule.forRoot(loadConfig()),
         ScheduleModule.forRoot(),
-        MongooseModule.forRoot('mongodb://heliandro:pass123@localhost:27018/teamwork_leadtime'),
+        MongooseModule.forRoot(process.env.MONGODB_CONNECTION_STRING),
         MongooseModule.forFeature([
             { name: 'projects', schema: ProjectSchema },
             { name: 'app-configurations', schema: AppLastUpdateSchema },
             { name: 'squads', schema: SquadSchema }
         ]),
+        RabbitMQModule.forRoot(RabbitMQModule, {
+            exchanges: [
+                {
+                    name: 'bitbucket_commits_exchange',
+                    type: 'topic',
+                },
+                {
+                    name: 'dead_letter_bitbucket_commits_exchange',
+                    type: 'topic',
+                }
+            ],
+            uri: process.env.RABBITMQ_CONNECTION_STRING,
+            enableControllerDiscovery: true,
+            connectionInitOptions: { wait: true }
+        }),
         UtilsModule,
         HttpModule,
     ],
     controllers: [AppController],
     providers: [
-        { provide: 'HealthUseCase', useClass: HealthImplUseCase },
         MetricsDataLoaderScheduler,
+        CommitConsumerQueue,
+        { provide: 'HealthUseCase', useClass: HealthImplUseCase },
         {
             provide: 'AppConfigurationRepository',
             useClass: AppConfigurationRepository,
@@ -104,7 +122,7 @@ export function loadConfig(): any {
         {
             provide: 'DataLoaderBitbucketCommitsUseCase',
             useClass: DataLoaderBitbucketCommitsImplUseCase
-        }
+        },
     ],
 })
 export class AppModule {}
