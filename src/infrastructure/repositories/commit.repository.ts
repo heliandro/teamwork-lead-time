@@ -16,6 +16,10 @@ export class CommitRepository {
         return this.commitModel.find().exec();
     }
 
+    async getAllByFields(fields: any): Promise<CommitDocument[]> {
+        return this.commitModel.find({ ...fields }).exec();
+    }
+
     async getCommitById(commitId: string): Promise<CommitDocument> {
         return this.commitModel.findOne({ documentId: commitId }).exec();
     }

@@ -3,6 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConsoleLoggerService } from 'src/utils/services/console-logger.service';
 import { DataLoaderBitbucketProjectsUseCase } from 'src/application/usecases/interfaces/data-loader-bitbucket-projects.usecase';
 import { DataLoaderBitbucketCommitsUseCase } from 'src/application/usecases/interfaces/data-loader-bitbucket-commits.usecase';
+import { DataLoaderBitbucketCommitsExtraInfoUseCase } from 'src/application/usecases/interfaces/data-loader-bitbucket-commits-extrainfo.usecase';
 
 @Injectable()
 export class MetricsDataLoaderScheduler {
@@ -20,6 +21,8 @@ export class MetricsDataLoaderScheduler {
         private readonly dataLoaderBitbucketProjectsUseCase: DataLoaderBitbucketProjectsUseCase,
         @Inject('DataLoaderBitbucketCommitsUseCase')
         private readonly dataLoaderBitbucketCommitsUseCase: DataLoaderBitbucketCommitsUseCase,
+        @Inject('DataLoaderBitbucketCommitsExtraInfoUseCase')
+        private readonly dataLoaderBitbucketCommitsExtraInfoUseCase: DataLoaderBitbucketCommitsExtraInfoUseCase,
     ) {
         this.logger.setContext(MetricsDataLoaderScheduler.name);
         this.loarderMainInfo();
@@ -69,7 +72,7 @@ export class MetricsDataLoaderScheduler {
     private async runExtraDataLoader() {
         try {
             this.logger.log('scheduler de carga de dados de métricas para informações adicionais iniciada!');
-            // TODO - implementar usecase para a carga de dados de métricas para informações adicionais
+            await this.dataLoaderBitbucketCommitsExtraInfoUseCase.execute();
             this.logger.log('scheduler de carga de dados de métricas para informações adicionais finalizada!');
         } catch (error) {
             this.logger.error(`scheduler de carga de dados de métricas para informações adicionais finalizada com erro: ${error.message}`);

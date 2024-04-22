@@ -75,6 +75,17 @@ export class CommitConsumerQueue {
             * 9. Atualizar a collection de commits do mongodb
             */
 
+            // TODO - LOGICA
+            //     let updatedCommit;
+            //     const commitBranchInfo = await this.bitbucketGateway.fetchCommitBranchInfo(commit.projectId, commit.commitId);
+            //     updatedCommit = CommitBranchInfoMapper.toEntity(commitBranchInfo, commit);
+
+            //     const commitJiraInfo = await this.jiraGateway.fetchCommitJiraInfo(commit.commitId);
+            //     updatedCommit = CommitJiraInfoMapper.toEntity(commitJiraInfo, updatedCommit);
+
+            //     updatedCommit.status = 'Finalizado';
+            //     await this.commitRepository.update(updatedCommit);
+
         } catch (error) {
             this.logger.error(`error:: ${error}`);
             return new Nack(false);

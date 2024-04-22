@@ -28,6 +28,7 @@ import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { CommitSchema } from './domain/schemas/commit.schema';
 import { CommitRepository } from './infrastructure/repositories/commit.repository';
+import { DataLoaderBitbucketCommitsExtraInfoImplUseCase } from './application/usecases/data-loader-bitbucket-commits-extrainfo-impl.usecase';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -144,6 +145,10 @@ export function loadConfig(): any {
         {
             provide: 'CommitRepository',
             useClass: CommitRepository
+        },
+        {
+            provide: 'DataLoaderBitbucketCommitsExtraInfoUseCase',
+            useClass: DataLoaderBitbucketCommitsExtraInfoImplUseCase
         }
     ],
 })

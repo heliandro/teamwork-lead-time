@@ -6,9 +6,10 @@ export class AppUpdateConfig {
     private bambooLastUpdate: Date;
     private jiraLastUpdate: Date;
 
-    private static bitbucketTimeToCheckInMinutes: number = 120;
-    private static bambooTimeToCheckInMinutes: number = 30;
-    private static jiraTimeToCheckInMinutes: number = 30;
+    private static bitbucketProjectsTimeToCheckInMinutes: number = 1440 * 2; // 24 horas | 1440 minutos || 3 dias | 4320 minutos
+    private static bitbucketCommitsTimeToCheckInMinutes: number = 720; // 6 horas | 360 minutos || 12 horas | 720 minutos
+    private static bambooTimeToCheckInMinutes: number = 360;
+    private static jiraTimeToCheckInMinutes: number = 360;
 
     constructor(documentId: string, bitbucketProjectsLastUpdate: Date, bitbucketCommitsLastUpdate: Date, bambooLastUpdate: Date, jiraLastUpdate: Date) {
         this.documentId = documentId;
@@ -39,11 +40,11 @@ export class AppUpdateConfig {
     }
 
     isBitbucketProjectsUpdated(): boolean {
-        return this._calculateIfLastUpdateIsValid(this.bitbucketProjectsLastUpdate, AppUpdateConfig.bitbucketTimeToCheckInMinutes);
+        return this._calculateIfLastUpdateIsValid(this.bitbucketProjectsLastUpdate, AppUpdateConfig.bitbucketProjectsTimeToCheckInMinutes);
     }
 
     isBitbucketCommitsUpdated(): boolean {
-        return this._calculateIfLastUpdateIsValid(this.bitbucketCommitsLastUpdate, AppUpdateConfig.bitbucketTimeToCheckInMinutes);
+        return this._calculateIfLastUpdateIsValid(this.bitbucketCommitsLastUpdate, AppUpdateConfig.bitbucketCommitsTimeToCheckInMinutes);
     }
 
     isBambooUpdated(): boolean {
