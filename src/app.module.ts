@@ -31,6 +31,8 @@ import { CommitRepository } from './infrastructure/repositories/commit.repositor
 import { DataLoaderBitbucketCommitsExtraInfoImplUseCase } from './application/usecases/data-loader-bitbucket-commits-extrainfo-impl.usecase';
 import { ListCommitsFromProjectImplUseCase } from './application/usecases/list-commits-from-project-impl.usecase';
 import { JiraImplGateway } from './infrastructure/gateways/jira-impl.gateway';
+import { FetchCommitExtraInfoFromBitbucketImplUseCase } from './application/usecases/fetch-commit-extrainfo-from-bitbucket-impl.usecase';
+import { FetchCommitsFromBitbucketImplUseCase } from './application/usecases/fetch-commits-from-bitbucket-impl.usecase';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -159,6 +161,14 @@ export function loadConfig(): any {
         {
             provide: 'JiraGateway',
             useClass: JiraImplGateway
+        },
+        {
+            provide: 'FetchCommitExtraInfoFromBitbucketUseCase',
+            useClass: FetchCommitExtraInfoFromBitbucketImplUseCase
+        },
+        {
+            provide: 'FetchCommitsFromBitbucketUseCase',
+            useClass: FetchCommitsFromBitbucketImplUseCase
         }
     ],
 })

@@ -1,22 +1,21 @@
 import { Commit, CommitBuilder } from "src/domain/entities/commit.entity";
-import { CommitDocument } from "src/domain/schemas/commit.schema";
 
 export class BitbucketCommitJiraInfoMapper {
-    static toEntity(bitbucketCommitJiraInfo: any, commitDocument: CommitDocument): Commit {
+    static toEntity(bitbucketCommitJiraInfo: any, commit: Commit): Commit {
         return new CommitBuilder()
-            .withDocumentId(commitDocument.documentId)
-            .withProjectId(commitDocument.projectId)
-            .withBranchRef(commitDocument.branchRef)
+            .withDocumentId(commit.getDocumentId())
+            .withProjectId(commit.getProjectId())
+            .withBranchRef(commit.getBranchRef())
             .withJiraHistoryId(BitbucketCommitJiraInfoMapper._getJiraHistoryId(bitbucketCommitJiraInfo))
-            .withJiraIssueId(commitDocument.jiraIssueId)
+            .withJiraIssueId(commit.getJiraIssueId())
             .withJiraIssueType(BitbucketCommitJiraInfoMapper._getJiraIssueType(bitbucketCommitJiraInfo))
-            .withMessage(commitDocument.message)
-            .withDate(commitDocument.date)
-            .withAuthorId(commitDocument.authorId)
-            .withAuthorName(commitDocument.authorName)
-            .withAuthorEmail(commitDocument.authorEmail)
+            .withMessage(commit.getMessage())
+            .withDate(commit.getDate())
+            .withAuthorId(commit.getAuthorId())
+            .withAuthorName(commit.getAuthorName())
+            .withAuthorEmail(commit.getAuthorEmail())
             .withSquadId(BitbucketCommitJiraInfoMapper._getSquadId(bitbucketCommitJiraInfo))
-            .withStatusQueue(commitDocument.statusQueue)
+            .withStatusQueue('Finalizado')
             .build();
     }
 
