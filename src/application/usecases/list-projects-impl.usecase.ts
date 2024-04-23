@@ -5,6 +5,8 @@ import { ProjectRepository } from "src/infrastructure/repositories/project.repos
 import { ListProjectsInputDTO } from "../dtos/list-projects-input.dto";
 import { ListProjectsOutputSuccessDTO } from "../dtos/list-projects-output-success.dto";
 import { ProjectDocument } from "src/domain/schemas/project.schema";
+import { SquadRepository } from "src/infrastructure/repositories/squad.repository";
+import { SquadDocument } from "src/domain/schemas/squad.schema";
 
 @Injectable()
 export class ListProjectsImplUseCase implements ListProjectsUseCase {
@@ -14,6 +16,8 @@ export class ListProjectsImplUseCase implements ListProjectsUseCase {
         private readonly logger: ConsoleLoggerService,
         @Inject('ProjectRepository')
         private readonly projectsRepository: ProjectRepository,
+        @Inject('SquadRepository')
+        private readonly squadRepository: SquadRepository,
     ) {
         this.logger.setContext(ListProjectsImplUseCase.name);
     }
@@ -21,28 +25,54 @@ export class ListProjectsImplUseCase implements ListProjectsUseCase {
     async execute(input?: ListProjectsInputDTO): Promise<ListProjectsOutputSuccessDTO> {
         this.logger.log('iniciando busca dos projetos...');
         if (this.shouldSearchProjectsByIds(input)) {
-            return this.searchProjectsByIds(input);
+            this.logger.log(`recuperando projetos pela lista de ids...`);
+            const result = await this.searchProjectsById(input.projectIds);
+            this.logger.log(`${result.length} projetos recuperados pela lista de ids com sucesso!`);
+            return new ListProjectsOutputSuccessDTO(result);
         }
-        return this.searchAllProjects();
+
+        if (this.shouldSearchProjectsBySquad(input)) {
+            this.logger.log(`recuperando projetos pela lista de squads...`);
+            const result = await this.searchProjectsBySquad();
+            this.logger.log(`${result.length} projetos recuperados pela lista de squads com sucesso!`);
+            return new ListProjectsOutputSuccessDTO(result);
+        }
+
+        return await this.searchAllProjects();
     }
 
     private shouldSearchProjectsByIds(input: ListProjectsInputDTO): boolean {
-        return input?.projectIds?.length > 0;
+        return input?.projectIds && input.projectIds.length > 0;
     }
 
-    private async searchProjectsByIds(input: ListProjectsInputDTO): Promise<ListProjectsOutputSuccessDTO> {
-        this.logger.log(`recuperando projetos pela lista de ids...`);
+    private shouldSearchProjectsBySquad(input: ListProjectsInputDTO): boolean {
+        return input?.fromSquads;
+    }
+
+    private async searchProjectsById(projectIds: string[]): Promise<ProjectDocument[]> {
         let projectsMap: Map<string, ProjectDocument> = new Map<string, ProjectDocument>();
 
-        for (const projectId of input.projectIds) {
+        for (const projectId of projectIds) {
             const result: ProjectDocument = await this.projectsRepository.getProjectById(projectId);
             if (result?.documentId) {
                 projectsMap.set(result.documentId, result);
             }
         }
 
-        this.logger.log(`${projectsMap.size} projetos recuperados com sucesso!`);
-        return new ListProjectsOutputSuccessDTO(this.iterableMapToArray(projectsMap));
+        return this.iterableMapToArray(projectsMap);
+    }
+
+    private async searchProjectsBySquad(): Promise<ProjectDocument[]> {
+        let squads: SquadDocument[] = await this.squadRepository.getAll();
+        let projectsMap: Map<string, ProjectDocument> = new Map<string, ProjectDocument>();
+
+        for (const squad of squads) {
+            const projectIds = squad.linkedProjects.map((project: any) => project.name);
+            const result: ProjectDocument[] = await this.searchProjectsById(projectIds);
+            projectsMap = new Map([...projectsMap, ...new Map(result.map((project) => [project.documentId, project]))]);
+        }
+
+        return this.iterableMapToArray(projectsMap);
     }
 
     private async searchAllProjects(): Promise<ListProjectsOutputSuccessDTO> {

@@ -8,7 +8,7 @@ import { CACHE_MANAGER, Cache, CacheInterceptor, CacheKey, CacheTTL } from '@nes
 
 interface BitbucketRequestOptions {
     headers: { Authorization: string };
-    queryParams: { limit: number };
+    queryParams?: { start?: number, limit?: number };
 }
 
 class BitbucketRequest {
@@ -28,6 +28,7 @@ export class BitbucketImplGateway implements BitbucketGateway {
     private bitbucketApiToken: string;
     private projectsRequest: BitbucketRequest
     private commitsRequest: BitbucketRequest
+    private commitBranchInfoRequest: BitbucketRequest
     private cacheTTL: number = 3600;
 
     constructor(
@@ -70,6 +71,14 @@ export class BitbucketImplGateway implements BitbucketGateway {
                 queryParams: {
                     limit: 1000,
                 },
+            },
+        );
+        this.commitBranchInfoRequest = new BitbucketRequest(
+            `${this.bitbucketBaseUrl}/rest/branch-utils/latest/projects/${this.bitbucketProjectSlug}/repos/__PROJECTID__/branches/info/__COMMITID__`,
+            {
+                headers: {
+                    Authorization: `Bearer ${this.bitbucketApiToken}`,
+                }
             },
         );
     }
@@ -170,5 +179,20 @@ export class BitbucketImplGateway implements BitbucketGateway {
     private async _getFromCache(cacheKey: string): Promise<any[]> {
         const cachedData: any[] = await this.cacheManager.get(cacheKey);
         return cachedData;
+    }
+
+    async fetchCommitBranchInfo(commitId: string, projectId: string): Promise<any> {
+        this.logger.log('recuperando informações extras dos commits do bitbucket...');
+        let commitBranchInfoUrl = this.commitBranchInfoRequest.url
+            .replace('__PROJECTID__', projectId)
+            .replace('__COMMITID__', commitId);
+
+        const response = await this.httpService.axiosRef.get(
+            commitBranchInfoUrl,
+            { headers: this.commitBranchInfoRequest.options.headers }
+        );
+        
+        this.logger.log('informações extras dos commits do bitbucket recuperadas com sucesso!');
+        return response.data;
     }
 }

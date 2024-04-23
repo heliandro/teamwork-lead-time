@@ -1,10 +1,15 @@
+export interface SquadMember {
+    id?: string;
+    name?: string;
+    email?: string;
+}
 export class Squad {
     private documentId: string;
     private name: string;
-    private members: string[];
+    private members: SquadMember[];
     private linkedProjects: string[];
 
-    constructor(documentId: string, name: string, members: string[], linkedProjects: string[]) {
+    constructor(documentId: string, name: string, members: SquadMember[], linkedProjects: string[]) {
         this.documentId = documentId;
         this.name = name;
         this.members = members;
@@ -19,7 +24,7 @@ export class Squad {
         return this.name;
     }
 
-    getMembers(): string[] {
+    getMembers(): SquadMember[] {
         return this.members;
     }
 
@@ -31,7 +36,7 @@ export class Squad {
 export class SquadBuilder {
     private documentId: string;
     private name: string;
-    private members: string[];
+    private members: SquadMember[];
     private linkedProjects: string[];
 
     constructor() {
@@ -51,7 +56,7 @@ export class SquadBuilder {
         return this;
     }
 
-    withMembers(members: string[]): SquadBuilder {
+    withMembers(members: SquadMember[]): SquadBuilder {
         this.members = members;
         return this;
     }

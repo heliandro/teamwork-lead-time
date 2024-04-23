@@ -1,4 +1,4 @@
-import { IsArray, IsOptional } from "class-validator";
+import { IsArray, IsBoolean, IsOptional } from "class-validator";
 
 export class ListProjectsInputDTO {
 
@@ -6,7 +6,7 @@ export class ListProjectsInputDTO {
     @IsArray({ message: 'projectIds must be an array of strings' })
     projectIds?: string[];
 
-    constructor(projectIds?: string[]) {
-        this.projectIds = projectIds;
-    }
+    @IsOptional()
+    @IsBoolean({ message: 'filter fromSquads must be a boolean' })
+    fromSquads?: boolean;
 }

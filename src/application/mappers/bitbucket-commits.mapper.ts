@@ -15,6 +15,7 @@ export class BitbucketCommitsMapper {
                 .withAuthorId(bitbucketCommit?.committer?.slug)
                 .withAuthorName(bitbucketCommit?.committer?.displayName)
                 .withAuthorEmail(bitbucketCommit?.committer?.emailAddress)
+                .withSquadId('')
                 .withStatusQueue(statusQueue || 'Em Processamento')
                 .build();
         });

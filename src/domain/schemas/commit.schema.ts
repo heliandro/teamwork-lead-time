@@ -39,6 +39,9 @@ export class CommitDocument extends Document {
     authorEmail: string;
 
     @Prop()
+    squadId: string;
+
+    @Prop()
     statusQueue: string;
 }
 

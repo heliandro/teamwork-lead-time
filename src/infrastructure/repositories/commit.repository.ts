@@ -20,12 +20,12 @@ export class CommitRepository {
         return this.commitModel.find({ ...fields }).exec();
     }
 
-    async getCommitById(commitId: string): Promise<CommitDocument> {
+    async getById(commitId: string): Promise<CommitDocument> {
         return this.commitModel.findOne({ documentId: commitId }).exec();
     }
 
     async save(commit: Commit): Promise<CommitDocument> {
-        let existingCommit = await this.getCommitById(commit.getDocumentId());
+        let existingCommit = await this.getById(commit.getDocumentId());
 
         if (existingCommit) {
             existingCommit.set(commit);

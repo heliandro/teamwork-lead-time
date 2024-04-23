@@ -10,6 +10,7 @@ export class Commit {
     private authorId: string; // slug => key
     private authorName: string; // displayName
     private authorEmail: string; // email
+    private squadId: string;
     private statusQueue: string;
     
     constructor(
@@ -24,6 +25,7 @@ export class Commit {
         authorId: string,
         authorName: string,
         authorEmail: string,
+        squadId: string,
         statusQueue: string
     ) {
         this.documentId = documentId;
@@ -37,6 +39,7 @@ export class Commit {
         this.authorId = authorId;
         this.authorName = authorName;
         this.authorEmail = authorEmail;
+        this.squadId = squadId;
         this.statusQueue = statusQueue;
     }
 
@@ -84,6 +87,10 @@ export class Commit {
         return this.authorEmail;
     }
 
+    getSquadId(): string {
+        return this.squadId;
+    }
+
     getStatusQueue(): string {
         return this.statusQueue;
     }
@@ -101,6 +108,7 @@ export class CommitBuilder {
     private authorId: string;
     private authorName: string;
     private authorEmail: string;
+    private squadId: string;
     private statusQueue: string;
 
     withDocumentId(documentId: string): CommitBuilder {
@@ -158,6 +166,11 @@ export class CommitBuilder {
         return this;
     }
 
+    withSquadId(squadId: string): CommitBuilder {
+        this.squadId = squadId;
+        return this;
+    }
+
     withStatusQueue(statusQueue: string): CommitBuilder {
         this.statusQueue = statusQueue;
         return this;
@@ -176,6 +189,7 @@ export class CommitBuilder {
             this.authorId,
             this.authorName,
             this.authorEmail,
+            this.squadId,
             this.statusQueue
         );
     }

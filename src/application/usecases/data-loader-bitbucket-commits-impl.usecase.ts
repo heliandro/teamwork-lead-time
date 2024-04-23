@@ -2,17 +2,15 @@ import { Inject, Injectable } from "@nestjs/common";
 import { DataLoaderBitbucketCommitsUseCase } from "./interfaces/data-loader-bitbucket-commits.usecase";
 import { ListProjectsUseCase } from "./interfaces/list-projects.usecase";
 import { ConsoleLoggerService } from "src/utils/services/console-logger.service";
-import GetAllSquadsUseCase from "./interfaces/get-all-squads.usecase";
-import { GetAllSquadsOutputSuccessDTO } from "../dtos/get-all-squads-output-success.dto";
 import { GetAppUpdateConfigOutputSuccessDTO } from "../dtos/get-app-update-config-output-success.dto";
 import { GetAppUpdateConfigUseCase } from "./interfaces/get-app-update-config.usecase";
 import { ModifyAppUpdateConfigUseCase } from "./interfaces/modify-app-update-config.usecase";
 import { AppUpdateConfig } from "src/domain/entities/app-update-config.entity";
 import { Project } from "src/domain/entities/project.entity";
 import { ModifyAppUpdateConfigInputDTO } from "../dtos/modify-app-update-config-input.dto";
-import { BitbucketGateway } from "src/application/gateways/bitbucket.gateway";
 import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
 import { CommitRepository } from "src/infrastructure/repositories/commit.repository";
+import { ListProjectsOutputSuccessDTO } from "../dtos/list-projects-output-success.dto";
 
 @Injectable()
 export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucketCommitsUseCase {
@@ -20,10 +18,6 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     constructor(
         @Inject('ConsoleLogger')
         private readonly logger: ConsoleLoggerService,
-        @Inject('BitbucketGateway')
-        private readonly bitbucketGateway: BitbucketGateway,
-        @Inject('GetAllSquadsUseCase')
-        private readonly getAllSquadsUseCase: GetAllSquadsUseCase,
         @Inject('ListProjectsUseCase')
         private readonly listProjectsUseCase: ListProjectsUseCase,
         @Inject('GetAppUpdateConfigUseCase')
@@ -42,8 +36,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
             this.logger.log('iniciando carga dos commits do bitbucket...');
             const { isBitbucketCommitsUpdated, document } = await this.getAppConfiguration();
             this.validateIfBitbucketCommitsIsUpdated(isBitbucketCommitsUpdated);
-            const squadProjectIds = await this._getProjectIdsFromSquadsDatabase();
-            const projectIds = await this._getProjectIdsFromProjectsDatabase(squadProjectIds);
+            const projectIds: string[] = await this._getProjectIdsFromProjectsDatabase();
             await this._deleteAllCommitsFromDatabase();
             await this._sendToBitbucketCommitsQueue(projectIds);
             this.logger.log('processando carga dos commits do bitbucket via fila!');
@@ -65,15 +58,9 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
         }
     }
 
-    private async _getProjectIdsFromSquadsDatabase(): Promise<string[]> {
-        const squads: GetAllSquadsOutputSuccessDTO = await this.getAllSquadsUseCase.execute();
-        const projectIds = this._filterProjectsIdsFromSquads(squads);
-        return projectIds;
-    }
-
-    private async _getProjectIdsFromProjectsDatabase(projectIds: string[]): Promise<string[]> {
-        const projects = await this.listProjectsUseCase.execute({ projectIds });
-        const filteredProjectIds = await this._filterProjectsIdsFromProjects(projects.values);
+    private async _getProjectIdsFromProjectsDatabase(): Promise<string[]> {
+        const projects: ListProjectsOutputSuccessDTO = await this.listProjectsUseCase.execute({ fromSquads: true });
+        const filteredProjectIds = this._filterProjectsIdsFromProjects(projects.values);
         return filteredProjectIds;
     }
 
@@ -82,15 +69,14 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     }
 
     private async _deleteAllCommitsFromDatabase(): Promise<void> {
+        this.logger.log('deletando todos os commits do banco de dados...');
         await this.commitRepository.deleteAll();
     }
 
     private async _sendToBitbucketCommitsQueue(projectIds: string[]): Promise<void> {
         while (projectIds.length > 0) {
             const projectId = projectIds.shift();
-            const message = {
-                projectId
-            }
+            const message = { projectId }
             await this.amqpConnection.publish('bitbucket_commits_exchange', `project.${projectId}.commits`, message);
         }
     }
@@ -104,11 +90,5 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
             jiraLastUpdate: document.getJiraLastUpdate(),
         }
         await this.modifyAppUpdateConfigUseCase.execute(inputDTO);
-    }
-
-    private _filterProjectsIdsFromSquads(squads: GetAllSquadsOutputSuccessDTO): string[] {
-        return squads.values.reduce((acc, squad) => {
-            return [...acc, ...squad.getLinkedProjects().map((project: any) => project.name)];
-        }, []);
     }
 }

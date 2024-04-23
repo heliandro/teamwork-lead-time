@@ -12,6 +12,7 @@ export default class SquadDocumentsMapper {
             return new SquadBuilder()
                 .withDocumentId(squadDocument.documentId)
                 .withName(squadDocument.name)
+                .withMembers(squadDocument.members)
                 .withLinkedProjects(squadDocument.linkedProjects)
                 .build()
         });

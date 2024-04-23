@@ -29,6 +29,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { CommitSchema } from './domain/schemas/commit.schema';
 import { CommitRepository } from './infrastructure/repositories/commit.repository';
 import { DataLoaderBitbucketCommitsExtraInfoImplUseCase } from './application/usecases/data-loader-bitbucket-commits-extrainfo-impl.usecase';
+import { ListCommitsFromProjectImplUseCase } from './application/usecases/list-commits-from-project-impl.usecase';
+import { JiraImplGateway } from './infrastructure/gateways/jira-impl.gateway';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -149,6 +151,14 @@ export function loadConfig(): any {
         {
             provide: 'DataLoaderBitbucketCommitsExtraInfoUseCase',
             useClass: DataLoaderBitbucketCommitsExtraInfoImplUseCase
+        },
+        {
+            provide: 'ListCommitsFromProjectUseCase',
+            useClass: ListCommitsFromProjectImplUseCase
+        },
+        {
+            provide: 'JiraGateway',
+            useClass: JiraImplGateway
         }
     ],
 })

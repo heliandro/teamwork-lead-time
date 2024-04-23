@@ -2,6 +2,13 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
 export const SquadDocumentId = 'your_squad_id';
+
+interface Member {
+    id?: string;
+    name?: string;
+    email?: string;
+}
+
 @Schema()
 export class SquadDocument extends Document {
 
@@ -12,7 +19,7 @@ export class SquadDocument extends Document {
     name: string;
 
     @Prop()
-    members: string[];
+    members?: Member[];
 
     @Prop()
     linkedProjects: string[];
