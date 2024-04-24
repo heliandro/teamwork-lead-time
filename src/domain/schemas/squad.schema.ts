@@ -22,7 +22,7 @@ export class SquadDocument extends Document {
     members?: Member[];
 
     @Prop()
-    linkedProjects: string[];
+    linkedProjects: { name: string }[];
 }
 
 export const SquadSchema = SchemaFactory.createForClass(SquadDocument);

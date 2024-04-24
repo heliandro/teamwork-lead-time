@@ -33,6 +33,8 @@ import { ListCommitsFromProjectImplUseCase } from './application/usecases/list-c
 import { JiraImplGateway } from './infrastructure/gateways/jira-impl.gateway';
 import { FetchCommitExtraInfoFromBitbucketImplUseCase } from './application/usecases/fetch-commit-extrainfo-from-bitbucket-impl.usecase';
 import { FetchCommitsFromBitbucketImplUseCase } from './application/usecases/fetch-commits-from-bitbucket-impl.usecase';
+import { LeadTimeController } from './infrastructure/controllers/lead-time.controller';
+import { CalculateLeadTimeImplUseCase } from './application/usecases/calculate-lead-time-impl.usecase';
 
 function loadEnvFilesByNodeEnv(): string[] {
     switch (process.env.NODE_ENV) {
@@ -93,7 +95,7 @@ export function loadConfig(): any {
             isGlobal: true,
         }),
     ],
-    controllers: [AppController],
+    controllers: [AppController, LeadTimeController],
     providers: [
         {
             provide: APP_INTERCEPTOR,
@@ -169,6 +171,10 @@ export function loadConfig(): any {
         {
             provide: 'FetchCommitsFromBitbucketUseCase',
             useClass: FetchCommitsFromBitbucketImplUseCase
+        },
+        {
+            provide: 'CalculateLeadTimeUseCase',
+            useClass: CalculateLeadTimeImplUseCase
         }
     ],
 })

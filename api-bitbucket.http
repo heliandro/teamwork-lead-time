@@ -1,3 +1,18 @@
+### CHAMAR ENDPOINT DE LEADTIME
+
+GET http://localhost:3000/lead-time?startDate=2024-04-01
+Content-Type: application/json
+
+{
+   
+}
+### RESPONSE
+
+
+
+
+
+
 ### LISTAR REPOSITORIOS
 # @name reqListarRepositorios
 @limiteDeRepositorios = 200

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, SortOrder } from "mongoose";
 import { Commit } from "src/domain/entities/commit.entity";
 import { CommitDocument } from "src/domain/schemas/commit.schema";
 
@@ -18,6 +18,15 @@ export class CommitRepository {
 
     async getAllByFields(fields: any): Promise<CommitDocument[]> {
         return this.commitModel.find({ ...fields }).exec();
+    }
+
+    async getAllByFieldsAndSortedByDate(fields: any, isDescending: boolean = true): Promise<CommitDocument[]> {
+        const result: SortOrder = isDescending ? 'descending' : 'ascending';
+        const newFields = {
+            ...fields,
+            date: fields.date? { $gte: fields.date } : undefined
+        }
+        return this.commitModel.find({ ...newFields }).sort({ date: result }).exec();
     }
 
     async getById(commitId: string): Promise<CommitDocument> {
