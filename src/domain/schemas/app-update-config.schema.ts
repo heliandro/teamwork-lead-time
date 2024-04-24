@@ -15,6 +15,9 @@ export class AppUpdateConfigDocument extends Document {
     bitbucketCommitsLastUpdate: Date;
 
     @Prop()
+    bitbucketCommitsExtraInfoLastUpdate: Date;
+
+    @Prop()
     bambooLastUpdate: Date;
 
     @Prop()

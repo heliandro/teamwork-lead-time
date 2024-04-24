@@ -25,19 +25,20 @@ export class ListProjectsImplUseCase implements ListProjectsUseCase {
     async execute(input?: ListProjectsInputDTO): Promise<ListProjectsOutputSuccessDTO> {
         this.logger.log('iniciando busca dos projetos...');
         if (this.shouldSearchProjectsByIds(input)) {
-            this.logger.log(`recuperando projetos pela lista de ids...`);
+            this.logger.log(`recuperando projetos do database pela lista de ids...`);
             const result = await this.searchProjectsById(input.projectIds);
             this.logger.log(`${result.length} projetos recuperados pela lista de ids com sucesso!`);
             return new ListProjectsOutputSuccessDTO(result);
         }
 
         if (this.shouldSearchProjectsBySquad(input)) {
-            this.logger.log(`recuperando projetos pela lista de squads...`);
+            this.logger.log(`recuperando projetos do database pela lista de squads...`);
             const result = await this.searchProjectsBySquad();
             this.logger.log(`${result.length} projetos recuperados pela lista de squads com sucesso!`);
             return new ListProjectsOutputSuccessDTO(result);
         }
 
+        this.logger.log(`recuperando todos os projetos do database...`);
         return await this.searchAllProjects();
     }
 

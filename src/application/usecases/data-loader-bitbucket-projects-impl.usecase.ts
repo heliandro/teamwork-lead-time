@@ -36,8 +36,7 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
             this.logger.log('carga dos dados de projetos do bitbucket iniciada!');
             const { isBitbucketProjectsUpdated, document } = await this.getAppConfiguration();
             this.validateIfBitbucketProjectsUpdated(isBitbucketProjectsUpdated);
-            const projectIds = await this.getProjectsIdsFromSquads()
-            const bitbucketProjects = await this.getBitbucketProjects(projectIds);
+            const bitbucketProjects = await this.getBitbucketProjects();
             await this.saveProjectsInDatabase(bitbucketProjects);
             await this.updateAppConfiguration(document);
             this.logger.log('carga dos dados de projetos do bitbucket finalizada!');
@@ -58,14 +57,8 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
         }
     }
 
-    private async getProjectsIdsFromSquads(): Promise<string[]> {
-        const squads: GetAllSquadsOutputSuccessDTO = await this.getAllSquadsUseCase.execute();
-        const projectIds = this._getProjectsIdsFromSquads(squads);
-        return projectIds;
-    }
-
-    private async getBitbucketProjects(projectIds: string[]): Promise<any[]> {
-        const bitbucketProjects = await this.bitbucketGateway.fetchProjects(projectIds);
+    private async getBitbucketProjects(): Promise<any[]> {
+        const bitbucketProjects = await this.bitbucketGateway.fetchProjects();
         return bitbucketProjects;
     }
 
@@ -78,6 +71,7 @@ export class DataLoaderBitbucketProjectsImplUseCase implements DataLoaderBitbuck
             documentId: document.getDocumentId(),
             bitbucketProjectsLastUpdate: new Date(),
             bitbucketCommitsLastUpdate: document.getBitbucketCommitsLastUpdate(),
+            bitbucketCommitsExtraInfoLastUpdate: document.getBitbucketCommitsExtraInfoLastUpdate(),
             bambooLastUpdate: document.getBambooLastUpdate(),
             jiraLastUpdate: document.getJiraLastUpdate(),
         }

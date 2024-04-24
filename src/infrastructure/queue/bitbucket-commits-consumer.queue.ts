@@ -34,7 +34,7 @@ export class CommitConsumerQueue {
             const { projectId } = message;
             const result = await this.fetchCommitsFromBitbucketUseCase.execute({ projectId });
 
-            if (result.error) {
+            if (result?.error) {
                 return new Nack(false); // rejeita a mensagem
             }
             this.logger.log(`rabbitmq::commitsSubscribeHandler::commits recuperados com sucesso!`);
@@ -86,7 +86,7 @@ export class CommitConsumerQueue {
             //     }
             // }
         } catch (error) {
-            this.logger.error(`error:: ${error}`);
+            this.logger.error(`error:: ${error?.message}`);
             return new Nack(false);
         }
     }

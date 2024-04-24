@@ -22,6 +22,7 @@ export class ModifyAppUpdateConfigImplUseCase implements ModifyAppUpdateConfigUs
             .withDocumentId(input.documentId)
             .withBitbucketProjectsLastUpdate(input.bitbucketProjectsLastUpdate)
             .withBitbucketCommitsLastUpdate(input.bitbucketCommitsLastUpdate)
+            .withBitbucketCommitsExtraInfoLastUpdate(input.bitbucketCommitsExtraInfoLastUpdate)
             .withBambooLastUpdate(input.bambooLastUpdate)
             .withJiraLastUpdate(input.jiraLastUpdate)
             .build();

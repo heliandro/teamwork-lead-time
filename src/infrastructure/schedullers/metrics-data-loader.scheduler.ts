@@ -13,6 +13,8 @@ export class MetricsDataLoaderScheduler {
     private static MONDAY_TO_FRIDAY_AT_09_15AM = '0 15 09 * * 1-5';
     private static EVERY_5_MINUTES = "0 */5 * * * *" // a cada 5 minutos
     private static MONDAY_TO_FRIDAY_EVERY_5_MINUTES: string = '0 */5 * * * 1-7';
+    private static MONDAY_AT_7AM = "0 0 07 * * 1";
+    private static MONDAY_AT_7AM_30 = "0 30 07 * * 1";
 
     constructor(
         @Inject('ConsoleLogger')
@@ -26,20 +28,20 @@ export class MetricsDataLoaderScheduler {
     ) {
         this.logger.setContext(MetricsDataLoaderScheduler.name);
         this.loarderMainInfo();
-        // setTimeout(() => {
-        //     this.loaderExtraInfo();
-        // }, 1000 * 60 * 5); // 5 minutos
+        setTimeout(() => {
+            this.loaderExtraInfo();
+        }, 1000 * 60 * 5); // 30 minutos
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_9AM)
+    @Cron(MetricsDataLoaderScheduler.MONDAY_AT_7AM)
     private handleMainCron() {
         this.loarderMainInfo();
     }
 
     // every day of week at 9:15 AM
-    @Cron(MetricsDataLoaderScheduler.MONDAY_TO_FRIDAY_EVERY_5_MINUTES)
+    @Cron(MetricsDataLoaderScheduler.MONDAY_AT_7AM_30)
     private handleExtraCron() {
-        this.loaderExtraInfo();
+        // this.loaderExtraInfo();
     }
 
     private async loarderMainInfo() {

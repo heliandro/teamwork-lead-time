@@ -59,7 +59,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
     }
 
     private async _getProjectIdsFromProjectsDatabase(): Promise<string[]> {
-        const projects: ListProjectsOutputSuccessDTO = await this.listProjectsUseCase.execute({ fromSquads: true });
+        const projects: ListProjectsOutputSuccessDTO = await this.listProjectsUseCase.execute();
         const filteredProjectIds = this._filterProjectsIdsFromProjects(projects.values);
         return filteredProjectIds;
     }
@@ -86,6 +86,7 @@ export class DataLoaderBitbucketCommitsImplUseCase implements DataLoaderBitbucke
             documentId: document.getDocumentId(),
             bitbucketProjectsLastUpdate: document.getBitbucketProjectsLastUpdate(),
             bitbucketCommitsLastUpdate: new Date(),
+            bitbucketCommitsExtraInfoLastUpdate: document.getBitbucketCommitsExtraInfoLastUpdate(),
             bambooLastUpdate: document.getBambooLastUpdate(),
             jiraLastUpdate: document.getJiraLastUpdate(),
         }

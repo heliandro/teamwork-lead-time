@@ -8,6 +8,7 @@ export class GetAppUpdateConfigOutputSuccessDTO {
         document: AppUpdateConfig,
         isBitbucketProjectsUpdated: boolean,
         isBitbucketCommitsUpdated: boolean,
+        isBitbucketCommitsExtraInfoUpdated: boolean,
         isBambooUpdated: boolean,
         isJiraUpdated: boolean,
     }
@@ -18,6 +19,7 @@ export class GetAppUpdateConfigOutputSuccessDTO {
             document,
             isBitbucketProjectsUpdated: document.isBitbucketProjectsUpdated(),
             isBitbucketCommitsUpdated: document.isBitbucketCommitsUpdated(),
+            isBitbucketCommitsExtraInfoUpdated: document.isBitbucketCommitsExtraInfoUpdated(),
             isBambooUpdated: document.isBambooUpdated(),
             isJiraUpdated: document.isJiraUpdated(),
         }

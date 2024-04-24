@@ -17,6 +17,7 @@ db.app_configurations.insert(
         documentId: "app_update_config",
         bitbucketProjectsLastUpdate: null,
         bitbucketCommitsLastUpdate: null,
+        bitbucketCommitsExtraInfoLastUpdate: null,
         bambooLastUpdate: null,
         jiraLastUpdate: null,
     }

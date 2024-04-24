@@ -3,18 +3,20 @@ export class AppUpdateConfig {
     private documentId: string;
     private bitbucketProjectsLastUpdate: Date;
     private bitbucketCommitsLastUpdate: Date;
+    private bitbucketCommitsExtraInfoLastUpdate: Date;
     private bambooLastUpdate: Date;
     private jiraLastUpdate: Date;
 
-    private static bitbucketProjectsTimeToCheckInMinutes: number = 1440 * 2; // 24 horas | 1440 minutos || 3 dias | 4320 minutos
-    private static bitbucketCommitsTimeToCheckInMinutes: number = 720; // 6 horas | 360 minutos || 12 horas | 720 minutos
-    private static bambooTimeToCheckInMinutes: number = 360;
-    private static jiraTimeToCheckInMinutes: number = 360;
+    private static bitbucketProjectsTimeToCheckInMinutes: number = 1440 * 5; // 24 horas | 1440 minutos
+    private static bitbucketCommitsTimeToCheckInMinutes: number = 1444 * 5; // 6 horas | 360 minutos || 12 horas | 720 minutos
+    private static bambooTimeToCheckInMinutes: number = 1444 * 2;
+    private static jiraTimeToCheckInMinutes: number = 1444 * 2;
 
-    constructor(documentId: string, bitbucketProjectsLastUpdate: Date, bitbucketCommitsLastUpdate: Date, bambooLastUpdate: Date, jiraLastUpdate: Date) {
+    constructor(documentId: string, bitbucketProjectsLastUpdate: Date, bitbucketCommitsLastUpdate: Date, bitbucketCommitsExtraInfoLastUpdate: Date, bambooLastUpdate: Date, jiraLastUpdate: Date) {
         this.documentId = documentId;
         this.bitbucketProjectsLastUpdate = bitbucketProjectsLastUpdate;
         this.bitbucketCommitsLastUpdate = bitbucketCommitsLastUpdate;
+        this.bitbucketCommitsExtraInfoLastUpdate = bitbucketCommitsExtraInfoLastUpdate;
         this.bambooLastUpdate = bambooLastUpdate;
         this.jiraLastUpdate = jiraLastUpdate;
     }
@@ -31,6 +33,10 @@ export class AppUpdateConfig {
         return this.bitbucketCommitsLastUpdate;
     }
 
+    getBitbucketCommitsExtraInfoLastUpdate(): Date {
+        return this.bitbucketCommitsExtraInfoLastUpdate;
+    }
+
     getBambooLastUpdate(): Date {
         return this.bambooLastUpdate;
     }
@@ -45,6 +51,10 @@ export class AppUpdateConfig {
 
     isBitbucketCommitsUpdated(): boolean {
         return this._calculateIfLastUpdateIsValid(this.bitbucketCommitsLastUpdate, AppUpdateConfig.bitbucketCommitsTimeToCheckInMinutes);
+    }
+
+    isBitbucketCommitsExtraInfoUpdated(): boolean {
+        return this._calculateIfLastUpdateIsValid(this.bitbucketCommitsExtraInfoLastUpdate, AppUpdateConfig.bitbucketCommitsTimeToCheckInMinutes);
     }
 
     isBambooUpdated(): boolean {
@@ -75,6 +85,7 @@ export class AppUpdateConfigBuilder {
     private documentId: string;
     private bitbucketProjectsLastUpdate: Date;
     private bitbucketCommitsLastUpdate: Date;
+    private bitbucketCommitsExtraInfoLastUpdate: Date;
     private bambooLastUpdate: Date;
     private jiraLastUpdate: Date;
 
@@ -82,6 +93,7 @@ export class AppUpdateConfigBuilder {
         this.documentId = '';
         this.bitbucketProjectsLastUpdate = null;
         this.bitbucketCommitsLastUpdate = null;
+        this.bitbucketCommitsExtraInfoLastUpdate = null;
         this.bambooLastUpdate = null;
         this.jiraLastUpdate = null;
     }
@@ -101,6 +113,11 @@ export class AppUpdateConfigBuilder {
         return this;
     }
 
+    withBitbucketCommitsExtraInfoLastUpdate(bitbucketCommitsExtraInfoLastUpdate: Date): AppUpdateConfigBuilder {
+        this.bitbucketCommitsExtraInfoLastUpdate = bitbucketCommitsExtraInfoLastUpdate;
+        return this;
+    }
+
     withBambooLastUpdate(bambooLastUpdate: Date): AppUpdateConfigBuilder {
         this.bambooLastUpdate = bambooLastUpdate;
         return this;
@@ -112,6 +129,6 @@ export class AppUpdateConfigBuilder {
     }
 
     build(): AppUpdateConfig {
-        return new AppUpdateConfig(this.documentId, this.bitbucketProjectsLastUpdate, this.bitbucketCommitsLastUpdate, this.bambooLastUpdate, this.jiraLastUpdate);
+        return new AppUpdateConfig(this.documentId, this.bitbucketProjectsLastUpdate, this.bitbucketCommitsLastUpdate, this.bitbucketCommitsExtraInfoLastUpdate, this.bambooLastUpdate, this.jiraLastUpdate);
     }
 }
